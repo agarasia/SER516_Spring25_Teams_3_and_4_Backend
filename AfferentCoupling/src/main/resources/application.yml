@@ -5,3 +5,6 @@ server:
 spring:
   application:
     name: afferent-coupling-api
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/afferent_db
