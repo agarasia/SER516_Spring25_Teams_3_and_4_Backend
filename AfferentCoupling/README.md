@@ -19,7 +19,7 @@ This guide provides instructions on how to run the Afferent Coupling API applica
    ```
    http://localhost:8081/api/coupling/github?repoUrl=[GITHUB_URL]
    ```
-   - **Expected Input Value:** A GitHub repo url that contains java files.
+   - **Expected Input Value:** A GitHub repo url that contains java files. If you are testing with privategithub repo, then use both repo url and token as params.
 
 
 ## Testing the API using Postman
@@ -50,15 +50,28 @@ mvn clean package
 
 ### Running the Docker Container
 ```bash
-docker run -p 8081:8081 --name afferent-api-container afferent-api
+docker run -d --name mongodb -p 27017:27017 mongo
 ```
+```bash
+docker run --name afferent-api-container \
+  -p 8081:8081 \
+  -e SPRING_DATA_MONGODB_URI=mongodb://host.docker.internal:27017/afferent_db \
+  afferent-api
 
+```
 ### Stopping the Container
 ```bash
 docker stop afferent-api-container
 ```
+### Remove the Container
+```bash
+docker rm afferent-api-container
+```
 
 ## testing curl command 
 curl -X POST "http://localhost:8081/api/coupling/github?repoUrl={Github_URL}"
+
+## testing with private github repo url
+curl -X POST "http://localhost:8081/api/afferent-coupling/coupling/github?repoUrl={Github_URL}&token={Github_token}"
 
 

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  afferent-api:
+    build:
+      context: ./AfferentCoupling
+    container_name: afferent-api-container
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/afferent_db
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo_data:
+
