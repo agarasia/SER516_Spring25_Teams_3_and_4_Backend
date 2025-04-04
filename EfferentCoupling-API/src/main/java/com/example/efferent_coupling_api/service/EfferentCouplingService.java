@@ -1,7 +1,7 @@
 package com.example.efferent_coupling_api.service;
 
 import com.example.efferent_coupling_api.util.JavaParserUtil;
-import com.example.efferent_coupling_api.util.ZipExtractor;
+import com.example.efferent_coupling_api.util.GitCloner;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
