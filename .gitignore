@@ -1,3 +1,14 @@
+**/venv/
+**/__pycache__/
+**/.DS_Store
+
+# local env files
+.env.local
+.env.*.local
+
+# Editor directories and files
+*.env
+
 # Compiled class file
 *.class
 
