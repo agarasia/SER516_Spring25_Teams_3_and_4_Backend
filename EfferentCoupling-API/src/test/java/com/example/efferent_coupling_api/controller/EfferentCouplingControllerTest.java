@@ -24,17 +24,15 @@ class EfferentCouplingControllerTest {
     private EfferentCouplingController couplingController;
 
     @Test
-    void testAnalyzeZipFile() throws Exception {
+    void testAnalyzeFromGitHub() throws Exception {
+        String repoUrl = "https://github.com/example/repo.git";
 
-        MockMultipartFile file = new MockMultipartFile("file", "test.zip", "application/zip", new byte[]{});
+        Map<String, Integer> mockResponse = Collections.singletonMap("com.example.MyClass", 3);
+        when(couplingService.processGitHubRepo(repoUrl)).thenReturn(mockResponse);
 
-        // Mocking service response
-        Map<String, Integer> mockResponse = Collections.singletonMap("com.example.model.User", 2);
-        when(couplingService.processZipFile(file)).thenReturn(mockResponse);
-
-        Map<String, Integer> result = couplingController.analyzeZipFile(file);
+        Map<String, Integer> result = couplingController.analyzeFromGitHub(repoUrl);
 
         assertEquals(mockResponse, result);
-        verify(couplingService, times(1)).processZipFile(file);
+        verify(couplingService, times(1)).processGitHubRepo(repoUrl);
     }
 }

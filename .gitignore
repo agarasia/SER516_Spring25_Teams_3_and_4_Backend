@@ -28,3 +28,5 @@ cloned-repos/
 
 # Ignore build output directories
 target/
+
+.vscode
