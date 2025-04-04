@@ -4,9 +4,12 @@ import com.example.afferentcoupling.model.AfferentCouplingData;
 import com.example.afferentcoupling.model.CouplingRequest;
 import com.example.afferentcoupling.service.AfferentCouplingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 
 @CrossOrigin(origins = "*")
@@ -38,5 +41,15 @@ public class AfferentCouplingController {
         }
         service.saveCouplingData(repoUrl, result);
         return ResponseEntity.ok(result);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Bad Request");
+        response.put("message", ex.getMessage());
+        response.put("timestamp", Instant.now().toString());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
