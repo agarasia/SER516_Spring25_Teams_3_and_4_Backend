@@ -1,0 +1,14 @@
+FROM python:3.12.8-slim
+
+WORKDIR /app
+
+# Now we can copy from the entire repo structure
+COPY . /app/LCOMHS
+# etc., if you want more
+
+WORKDIR /app/LCOMHS
+RUN apt-get update && apt-get install -y git
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
