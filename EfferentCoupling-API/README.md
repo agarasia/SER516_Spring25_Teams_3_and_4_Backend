@@ -70,6 +70,6 @@ docker stop efferent-coupling-api
 ## testing curl command 
 curl -X POST http://localhost:8082/api/efferent-coupling/analyze \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "url=https://github.com/spring-projects/spring-petclinic.git"
+  -d "url=https://github.com/shashirajraja/shopping-cart"
 
 
