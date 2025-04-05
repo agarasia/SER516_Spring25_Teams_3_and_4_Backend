@@ -10,6 +10,10 @@ This guide provides instructions on how to run the Afferent Coupling API applica
    ```
 
 2. **Run the Application:**
+
+   ```bash
+   brew services start mongodb-community@6.0
+   ```
    ```bash
    mvn spring-boot:run
    ```

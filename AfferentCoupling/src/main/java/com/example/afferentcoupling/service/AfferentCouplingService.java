@@ -23,8 +23,7 @@ public class AfferentCouplingService {
 
    private static final String CLASS_PATTERN = "package\\s+([\\w\\.]+);.*?class\\s+(\\w+)";
    private static final String IMPORT_PATTERN = "import\\s+([\\w\\.]+);";
-   private static final Pattern GITHUB_URL_PATTERN = Pattern.compile("^(https://|git@)([^/]+)[/:]([^/]+)/([^/.]+)(\\.git)?$", Pattern.CASE_INSENSITIVE);
-
+   private static final Pattern GITHUB_URL_PATTERN = Pattern.compile("^(https://|git@)(github\\.com)[/:]([^/]+)/([^/.]+)(\\.git)?$", Pattern.CASE_INSENSITIVE);
    @Autowired
    private AfferentCouplingRepository repository;
 
