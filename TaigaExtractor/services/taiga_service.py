@@ -28,7 +28,7 @@ def taiga_login(username: str, password: str):
     else:
         response.raise_for_status()
 
-def taiga_get_projects(token: str, userid: str):
+def taiga_get_projects(userid: str):
     """
     Get user information from the Taiga API.
 
@@ -41,7 +41,7 @@ def taiga_get_projects(token: str, userid: str):
     """
     url = f"https://api.taiga.io/api/v1/projects?member={userid}"
     headers = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     }
 
     response = requests.get(url, headers=headers)
@@ -62,3 +62,43 @@ def taiga_get_projects(token: str, userid: str):
 
     else:
         response.raise_for_status()
+
+def taiga_get_user_stories(token: str, project_id: str, include_activity: bool = True):
+    """
+    Get user stories with optional activity data for a specific project.
+
+    Args:
+        token (str): Authentication token
+        project_id (str): Target project ID
+        include_activity (bool): Whether to fetch activity timeline
+
+    Returns:
+        list: User stories with selected fields
+    """
+    url = f"https://api.taiga.io/api/v1/userstories?project={project_id}"
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {token}'  # Critical authentication header
+    }
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    
+    user_stories = []
+    for story in response.json():
+        story_data = {
+            "id": story['id'],
+            "name": story['subject'],
+            "status": story.get('status_extra_name', ''),
+            "points": story.get('total_points', None)
+        }
+
+        if include_activity:
+            timeline_url = f"https://api.taiga.io/api/v1/history/userstory/{story['id']}"
+            timeline_response = requests.get(timeline_url, headers=headers)
+            if timeline_response.status_code == 200:
+                story_data['activity'] = [entry['comment'] for entry in timeline_response.json()]
+
+        user_stories.append(story_data)
+
+    return user_stories
