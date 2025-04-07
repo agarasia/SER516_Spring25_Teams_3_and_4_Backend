@@ -24,10 +24,30 @@ jobs:
 
       # Afferent Coupling API
       - name: Build with Maven
-        run: mvn clean package --file AfferentCoupling/pom.xml
+        run: mvn install -DskipTests --file AfferentCoupling/pom.xml
 
       - name: Run Unit Tests
         run: mvn test --file AfferentCoupling/pom.xml
 
       - name: Build Docker image
         run: docker build -t afferent-api AfferentCoupling/
+
+      # Efferent Coupling API
+      - name: Build with Maven
+        run: mvn install -DskipTests --file EfferentCoupling-API/pom.xml
+
+      - name: Run Unit Tests
+        run: mvn test --file EfferentCoupling-API/pom.xml
+
+      - name: Build Docker image
+        run: docker build -t efferent-api EfferentCoupling-API/
+
+      # Defect Density API
+      - name: Build with Maven
+        run: mvn install -DskipTests --file DefectDensity-API/pom.xml
+
+      - name: Run Unit Tests
+        run: mvn test --file DefectDensity-API/pom.xml
+
+      - name: Build Docker image
+        run: docker build -t defectdensity-api DefectDensity-API/
