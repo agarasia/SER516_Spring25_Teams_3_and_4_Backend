@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo
@@ -19,7 +17,18 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/afferent_db
     depends_on:
       - mongodb
+  
+  defectdensityapi:
+    build:
+      context: ./DefectDensity-API
+    container_name: defectdensityapi
+    ports:
+      - "8083:8083"
+    environment:
+      # Point URI at 'mongodb', because that's the service name
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/defectdensitydb
+    depends_on:
+      - mongodb
 
 volumes:
   mongo_data:
-

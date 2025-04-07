@@ -1,6 +1,8 @@
 package com.defectdensityapi.Controller;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -9,15 +11,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.web.client.RestTemplate;
 
+import com.defectdensityapi.model.DefectDensityHistory;
+import com.defectdensityapi.repository.DefectDensityHistoryRepository;
 import com.defectdensityapi.util.GithubLinkOwnerRepoExtractor;
 import com.defectdensityapi.util.LocApiAdapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @CrossOrigin(origins = "*")
-
 @RestController
 @RequestMapping("/api/defects")
 public class GitHubDefectController {
@@ -25,61 +29,86 @@ public class GitHubDefectController {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final LocApiAdapter locApiAdapter;
-    
-    public GitHubDefectController(LocApiAdapter locApiAdapter) {
+    private final DefectDensityHistoryRepository historyRepository;
+
+    public GitHubDefectController(LocApiAdapter locApiAdapter,
+                                  DefectDensityHistoryRepository historyRepository) {
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
         this.locApiAdapter = locApiAdapter;
+        this.historyRepository = historyRepository;
     }
 
     @GetMapping("/repo")
-    public String getDefectRepoCount(@RequestParam(value="url") String url1) throws Exception {
+    public ResponseEntity<Map<String, Object>> getDefectRepoCount(
+            @RequestParam(value = "url") String url1) throws Exception {
 
-        try{
+        Map<String, Object> responseMap = new HashMap<>();
+        try {
+            // Extract "owner/repo" from the GitHub URL
             String repoUrl = GithubLinkOwnerRepoExtractor.extractOwnerRepo(url1);
             if (repoUrl == null) {
-                return "Error: Invalid GitHub repository URL format."; // More descriptive error message
+                responseMap.put("error", "Invalid GitHub repository URL format.");
+                return ResponseEntity.badRequest().body(responseMap);
             }
-        
+
             // Validate that the URL belongs to GitHub
             if (!url1.startsWith("https://github.com/")) {
-                return "Error: Provided URL is not a valid GitHub repository.";
+                responseMap.put("error", "Provided URL is not a valid GitHub repository.");
+                return ResponseEntity.badRequest().body(responseMap);
             }
 
-            String url = "https://api.github.com/repos/" + repoUrl;
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            // Fetch repo info from GitHub
+            String apiUrl = "https://api.github.com/repos/" + repoUrl;
+            ResponseEntity<String> githubResponse = restTemplate.getForEntity(apiUrl, String.class);
+            JsonNode rootNode = objectMapper.readTree(githubResponse.getBody());
             int openIssuesCount = rootNode.get("open_issues_count").asInt();
 
+            // Fetch total lines of code
             int totalLinesOfCode = locApiAdapter.getTotalLinesOfCode();
 
             if (totalLinesOfCode == 0) {
-                return "Defect Density: N/A (Total lines of code is zero)";
+                // If zero, return error-like message, but still keep consistent structure
+                responseMap.put("defectDensity", "N/A (Total lines of code is zero)");
+                responseMap.put("history", null);
+                return ResponseEntity.ok(responseMap);
             }
-    
+
             // Calculate defect density per 1000 lines of code
             double defectDensityPerKLOC = (openIssuesCount * 1000.0) / totalLinesOfCode;
 
-            return String.format("%.2f", defectDensityPerKLOC);
+            // 1) Save the new entry to MongoDB
+            DefectDensityHistory newHistoryEntry = new DefectDensityHistory();
+            newHistoryEntry.setRepoUrl(repoUrl);
+            newHistoryEntry.setDefectDensity(defectDensityPerKLOC);
+            newHistoryEntry.setTimestamp(LocalDateTime.now());
+            historyRepository.save(newHistoryEntry);
 
-        }
-        catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
-            return "Error: Repository not found. Please check the GitHub URL.";
-        } 
-        catch (org.springframework.web.client.RestClientException e) {
-            return "Error: Unable to reach GitHub API. Please try again later.";
-        } 
-        catch (Exception e) {
-            return "Error: An unexpected error occurred - " + e.getMessage();
+            // 2) Retrieve the history for this repo (descending order by timestamp)
+            List<DefectDensityHistory> historyList = historyRepository.findByRepoUrlOrderByTimestampDesc(repoUrl);
+
+            // Prepare the response payload
+            responseMap.put("currentDefectDensity", String.format("%.2f", defectDensityPerKLOC));
+            responseMap.put("history", historyList);
+
+            return ResponseEntity.ok(responseMap);
+
+        } catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
+            responseMap.put("error", "Repository not found. Please check the GitHub URL.");
+            return ResponseEntity.badRequest().body(responseMap);
+        } catch (org.springframework.web.client.RestClientException e) {
+            responseMap.put("error", "Unable to reach GitHub API. Please try again later.");
+            return ResponseEntity.status(503).body(responseMap);
+        } catch (Exception e) {
+            responseMap.put("error", "An unexpected error occurred - " + e.getMessage());
+            return ResponseEntity.status(500).body(responseMap);
         }
     }
 
     @GetMapping("/loc-mock")
     public ResponseEntity<Map<String, Object>> mockLinesOfCodeApi() {
         Map<String, Object> mockResponse = new HashMap<>();
-        mockResponse.put("totalLinesOfCode", locApiAdapter.getTotalLinesOfCode()); 
+        mockResponse.put("totalLinesOfCode", locApiAdapter.getTotalLinesOfCode());
         return ResponseEntity.ok(mockResponse);
     }
-    
-
 }
