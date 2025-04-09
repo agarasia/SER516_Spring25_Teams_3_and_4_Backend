@@ -23,31 +23,88 @@ jobs:
           distribution: 'temurin'
 
       # Afferent Coupling API
-      - name: Build with Maven
+      - name: Build Afferent Coupling API
         run: mvn install -DskipTests --file AfferentCoupling/pom.xml
 
-      - name: Run Unit Tests
+      - name: Test Afferent Coupling API
         run: mvn test --file AfferentCoupling/pom.xml
 
-      - name: Build Docker image
+      - name: Dockerize Afferent Coupling API
         run: docker build -t afferent-api AfferentCoupling/
 
       # Efferent Coupling API
-      - name: Build with Maven
+      - name: Build Efferent Coupling API
         run: mvn install -DskipTests --file EfferentCoupling-API/pom.xml
 
-      - name: Run Unit Tests
+      - name: Test Efferent Coupling API
         run: mvn test --file EfferentCoupling-API/pom.xml
 
-      - name: Build Docker image
+      - name: Dockerize Efferent Coupling API
         run: docker build -t efferent-api EfferentCoupling-API/
 
       # Defect Density API
-      - name: Build with Maven
+      - name: Build Defect Density API
         run: mvn install -DskipTests --file DefectDensity-API/pom.xml
 
-      - name: Run Unit Tests
+      - name: Test Defect Density API
         run: mvn test --file DefectDensity-API/pom.xml
 
-      - name: Build Docker image
+      - name: Dockerize Defect Density API
         run: docker build -t defectdensity-api DefectDensity-API/
+
+  build-python-services:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip and install pytest
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      # Defect Score
+      - name: Install DefectScore dependencies
+        run: pip install -r DefectScore/requirements.txt
+
+      # - name: Test DefectScore
+      #   run: PYTHONPATH=DefectScore pytest DefectScore/tests
+
+      - name: Dockerize DefectScore
+        run: docker build -t defect-score DefectScore/
+
+      # LCOM4
+      - name: Install LCOM4 dependencies
+        run: pip install -r LCOM4/requirements.txt
+
+      # - name: Test LCOM4
+      #   run:  PYTHONPATH=LCOM4 pytest LCOM4/tests
+
+      - name: Dockerize LCOM4
+        run: docker build -t lcom4 LCOM4/
+
+      # LCOMHS
+      - name: Install LCOMHS dependencies
+        run: pip install -r LCOMHS/requirements.txt
+
+      # - name: Test LCOMHS
+      #   run: PYTHONPATH=LCOMHS pytest LCOMHS/tests
+
+      - name: Dockerize LCOMHS
+        run: docker build -t lcomhs LCOMHS/
+
+      # Middleware
+      - name: Install Middleware dependencies
+        run: pip install -r middleware/requirements.txt
+
+      # - name: Test Middleware
+      #   run: PYTHONPATH=middleware pytest middleware/tests
+
+      - name: Dockerize Middleware
+        run: docker build -t middleware middleware/
