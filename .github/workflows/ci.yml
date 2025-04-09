@@ -74,7 +74,7 @@ jobs:
         run: pip install -r DefectScore/requirements.txt
 
       - name: Test DefectScore
-        run: pytest DefectScore/tests
+        run: PYTHONPATH=DefectScore pytest DefectScore/tests
 
       - name: Dockerize DefectScore
         run: docker build -t defect-score DefectScore/
@@ -84,7 +84,7 @@ jobs:
         run: pip install -r LCOM4/requirements.txt
 
       - name: Test LCOM4
-        run: pytest LCOM4/tests
+        run:  PYTHONPATH=LCOM4 pytest LCOM4/tests
 
       - name: Dockerize LCOM4
         run: docker build -t lcom4 LCOM4/
@@ -94,7 +94,7 @@ jobs:
         run: pip install -r LCOMHS/requirements.txt
 
       - name: Test LCOMHS
-        run: pytest LCOMHS/tests
+        run: PYTHONPATH=LCOMHS pytest LCOMHS/tests
 
       - name: Dockerize LCOMHS
         run: docker build -t lcomhs LCOMHS/
@@ -104,7 +104,7 @@ jobs:
         run: pip install -r middleware/requirements.txt
 
       - name: Test Middleware
-        run: pytest middleware/tests
+        run: PYTHONPATH=middleware pytest middleware/tests
 
       - name: Dockerize Middleware
         run: docker build -t middleware middleware/
