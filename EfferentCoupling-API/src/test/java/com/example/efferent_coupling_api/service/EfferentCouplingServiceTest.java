@@ -46,6 +46,7 @@ class EfferentCouplingServiceTest {
                 .thenReturn(fakeCoupling);
     }
 
+    
     @Test
     void testProcessGitHubRepo_returnsExpectedResultAndSavesToDb() throws Exception {
         Map<String, Integer> result = service.processGitHubRepo(mockRepoUrl);
