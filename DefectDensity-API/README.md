@@ -17,18 +17,15 @@ This guide provides instructions on how to run the DefectDensity-API application
 3. **Access the API:**
    Once the application is running, you can access the API using the following URL:
    ```
-   http://localhost:8083/api/code-analysis/analyze [POST]
+   http://localhost:8083/api/defects/repo?url=[Use a git hub repo url] [GET]
    ```
    - **Variable Name:** `url`
    - **Expected Input Value:** A Github repository URL
 
 ## Building and Running with Docker
 
-### Prerequisites
-Ensure that the `.jar` file exists before building the Docker container. Use the following command to create the `.jar` file:
-```bash
-mvn clean package
-```
+### Prerequisites 
+
 
 ### Building the Docker Container
 ```bash
@@ -79,5 +76,7 @@ http://localhost:8083
 ```
 
 ## testing curl command 
-curl -v -X POST "http://localhost:8083/api/code-analysis/analyze" -F "file=@\"[locationToFile]""
-example my personal - /Users/twisted_fate/Desktop/E-commerce-project-springBoot-master2 (1).zip\
+a sample test Command
+```
+curl -X GET "http://localhost:8083/api/defects/repo?url=https://github.com/FreeTubeApp/FreeTube/Issues" -H "Accept: application/json"
+```
