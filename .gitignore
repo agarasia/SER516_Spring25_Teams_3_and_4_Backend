@@ -11,7 +11,11 @@
 
 # Compiled class file
 *.class
-
+.DS_Store
+.env
+*/__pycache__/
+*.pyc
+*/venv
 # Log file
 *.log
 

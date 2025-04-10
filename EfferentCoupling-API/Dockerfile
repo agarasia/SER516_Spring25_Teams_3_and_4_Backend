@@ -1,15 +1,20 @@
-# Use a base image with JDK
-FROM openjdk:21-jdk
-
-# Setting working directory
+# syntax=docker/dockerfile:1
+################  Build  ################
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copying the JAR dynamically from the Maven build step
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} efferent-coupling-api.jar
+COPY pom.xml .
+RUN mvn -q dependency:go-offline
 
-# Exposing the port
-EXPOSE 8082
+COPY src ./src
+RUN mvn -q package -DskipTests         
+# → target/*.jar
 
-# Running the application
-ENTRYPOINT ["java", "-jar", "efferent-coupling-api.jar"]
+################  Run  ##################
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8083          
+# adjust per service
+ENTRYPOINT ["java","-jar","/app/app.jar"]

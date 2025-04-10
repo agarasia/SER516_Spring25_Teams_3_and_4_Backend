@@ -1,16 +1,20 @@
-
-# Use OpenJDK 21 as base image
-FROM openjdk:21-jdk
-
-# Set working directory inside the container
+# syntax=docker/dockerfile:1
+################  Build  ################
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy the JAR dynamically from the Maven build step
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} DefectDensityAPI.jar
+COPY pom.xml .
+RUN mvn -q dependency:go-offline
 
-# Expose port 8083 (or the port your Spring Boot app uses)
-EXPOSE 8083
+COPY src ./src
+RUN mvn -q package -DskipTests         
+# → target/*.jar
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "DefectDensityAPI.jar"]
+################  Run  ##################
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8083          
+# adjust per service
+ENTRYPOINT ["java","-jar","/app/app.jar"]

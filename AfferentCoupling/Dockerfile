@@ -1,7 +1,20 @@
-FROM eclipse-temurin:21-jdk-jammy
-RUN apt-get update && apt-get install -y git
+# syntax=docker/dockerfile:1
+################  Build  ################
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} afferent-coupling-api.jar
-EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "afferent-coupling-api.jar"]
+
+COPY pom.xml .
+RUN mvn -q dependency:go-offline
+
+COPY src ./src
+RUN mvn -q package -DskipTests         
+# → target/*.jar
+
+################  Run  ##################
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8083          
+# adjust per service
+ENTRYPOINT ["java","-jar","/app/app.jar"]
