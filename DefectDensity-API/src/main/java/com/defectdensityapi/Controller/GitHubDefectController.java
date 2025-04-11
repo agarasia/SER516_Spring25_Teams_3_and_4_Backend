@@ -130,4 +130,12 @@ public class GitHubDefectController {
             return ResponseEntity.status(500).body(responseMap);
         }
     }
+
+
+    @GetMapping("/loc-mock")
+    public ResponseEntity<Map<String, Object>> mockLinesOfCodeApi() {
+        Map<String, Object> mockResponse = new HashMap<>();
+        mockResponse.put("totalLinesOfCode", locApiAdapter.getTotalLinesOfCode());
+        return ResponseEntity.ok(mockResponse);
+    }
 }
