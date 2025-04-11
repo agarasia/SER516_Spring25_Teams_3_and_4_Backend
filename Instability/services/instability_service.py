@@ -1,4 +1,4 @@
-from services.mongo_service import store_instability_data_in_mongo
+# from services.mongo_service import store_instability_data_in_mongo
 
 def compute_instability(a_data, e_data):
     a_dict = {d["class_name"]: d["score"] for d in a_data}
@@ -41,5 +41,5 @@ def process_instability(input_data):
         "current_instability": current
     }
 
-    store_instability_data_in_mongo(result)  # ✅ No repo_url needed
+    # store_instability_data_in_mongo(result) 
     return result
