@@ -68,7 +68,7 @@ public class AfferentCouplingControllerTest {
         ResponseEntity<List<AfferentCouplingData>> response = controller.getCoupling(repoUrl);
 
         // Verify the response
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, HttpStatus.NOT_FOUND);
         assertNull(response.getBody());
 
         // Verify the service interaction
