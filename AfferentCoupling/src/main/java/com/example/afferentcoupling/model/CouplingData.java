@@ -1,6 +1,9 @@
 package com.example.afferentcoupling.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CouplingData {
+    @JsonProperty("class_name")
     private String className;
 
     public String getClassName() {
@@ -11,6 +14,7 @@ public class CouplingData {
         this.className = className;
     }
 
+    @JsonProperty("score")
     private Integer couplingScore;
 
     public Integer getCouplingScore() {

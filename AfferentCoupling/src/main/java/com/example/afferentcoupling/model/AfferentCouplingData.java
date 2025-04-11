@@ -1,5 +1,6 @@
 package com.example.afferentcoupling.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -10,7 +11,9 @@ public class AfferentCouplingData {
     @Id
     private String id;
     private String repoUrl;
-    private List<CouplingData> data;
+
+    @JsonProperty("data") // Serialize this field as "data" instead of "couplingData"
+    private List<CouplingData> couplingData;
     private String timestamp;
 
     public String getId() {
@@ -30,11 +33,11 @@ public class AfferentCouplingData {
     }
 
     public List<CouplingData> getCouplingData() {
-        return data;
+        return couplingData;
     }
 
     public void setCouplingData(List<CouplingData> couplingData) {
-        this.data = couplingData;
+        this.couplingData = couplingData;
     }
 
     public String getTimestamp() {
