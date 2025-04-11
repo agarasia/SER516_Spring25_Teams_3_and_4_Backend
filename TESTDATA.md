@@ -17,5 +17,10 @@
  - https://github.com/virattt/ai-hedge-fund
 
 ### DefectScore Service TestData
+ - https://github.com/aapati17/testJavaProject
+
 ### LCOM4 Service TestData
+ - https://github.com/aapati17/testJavaProject
+
 ### LCOMHS Service TestData
+ - https://github.com/aapati17/testJavaProject
