@@ -1,6 +1,7 @@
 package com.defectdensityapi.Controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,19 +78,44 @@ public class GitHubDefectController {
             // Calculate defect density per 1000 lines of code
             double defectDensityPerKLOC = (openIssuesCount * 1000.0) / totalLinesOfCode;
 
-            // 1) Save the new entry to MongoDB
+            // Retrieve the history for this repo (descending order by timestamp)
+            List<DefectDensityHistory> historyList = historyRepository.findByRepoUrlOrderByTimestampDesc(repoUrl);
+
+            // --- Build the payload in the new desired structure ---
+            // Capture the current timestamp and use it for both the current defect and new DB entry
+            LocalDateTime currentTimestamp = LocalDateTime.now();
+
+            // Create the "current_defect_density" payload with formatted value (rounded to 2 decimals)
+            double defectDensityFormatted = Double.parseDouble(String.format("%.2f", defectDensityPerKLOC));
+            Map<String, Object> currentDefectMap = new HashMap<>();
+            currentDefectMap.put("timestamp", currentTimestamp.toString());
+            Map<String, Object> currentDataMap = new HashMap<>();
+            currentDataMap.put("defect_density", defectDensityFormatted);
+            currentDefectMap.put("data", currentDataMap);
+
+            // Build the "defect_density_history" list by adding the current measurement as first entry
+            List<Map<String, Object>> defectDensityHistoryList = new ArrayList<>();
+
+            // Append each previous history entry (from DB) formatted as required
+            for (DefectDensityHistory history : historyList) {
+                Map<String, Object> historyEntry = new HashMap<>();
+                historyEntry.put("timestamp", history.getTimestamp().toString());
+                Map<String, Object> historyData = new HashMap<>();
+                historyData.put("defect_density", history.getDefectDensity());
+                historyEntry.put("data", historyData);
+                defectDensityHistoryList.add(historyEntry);
+            }
+
+            // Populate the final response map with the new keys
+            responseMap.put("current_defect_density", currentDefectMap);
+            responseMap.put("defect_density_history", defectDensityHistoryList);
+
+            // --- Now, after payload preparation, save the new history entry in MongoDB ---
             DefectDensityHistory newHistoryEntry = new DefectDensityHistory();
             newHistoryEntry.setRepoUrl(repoUrl);
             newHistoryEntry.setDefectDensity(defectDensityPerKLOC);
-            newHistoryEntry.setTimestamp(LocalDateTime.now());
+            newHistoryEntry.setTimestamp(currentTimestamp);
             historyRepository.save(newHistoryEntry);
-
-            // 2) Retrieve the history for this repo (descending order by timestamp)
-            List<DefectDensityHistory> historyList = historyRepository.findByRepoUrlOrderByTimestampDesc(repoUrl);
-
-            // Prepare the response payload
-            responseMap.put("currentDefectDensity", String.format("%.2f", defectDensityPerKLOC));
-            responseMap.put("history", historyList);
 
             return ResponseEntity.ok(responseMap);
 
@@ -104,6 +130,7 @@ public class GitHubDefectController {
             return ResponseEntity.status(500).body(responseMap);
         }
     }
+
 
     @GetMapping("/loc-mock")
     public ResponseEntity<Map<String, Object>> mockLinesOfCodeApi() {
