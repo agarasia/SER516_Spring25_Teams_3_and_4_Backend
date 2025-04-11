@@ -96,14 +96,6 @@ public class GitHubDefectController {
             // Build the "defect_density_history" list by adding the current measurement as first entry
             List<Map<String, Object>> defectDensityHistoryList = new ArrayList<>();
 
-            // Add the new computed measurement as the first history entry using the precise (unformatted) value
-            Map<String, Object> currentHistoryEntry = new HashMap<>();
-            currentHistoryEntry.put("timestamp", currentTimestamp.toString());
-            Map<String, Object> currentHistoryData = new HashMap<>();
-            currentHistoryData.put("defect_density", defectDensityPerKLOC);
-            currentHistoryEntry.put("data", currentHistoryData);
-            defectDensityHistoryList.add(currentHistoryEntry);
-
             // Append each previous history entry (from DB) formatted as required
             for (DefectDensityHistory history : historyList) {
                 Map<String, Object> historyEntry = new HashMap<>();
