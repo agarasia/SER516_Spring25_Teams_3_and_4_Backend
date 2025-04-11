@@ -1,0 +1,24 @@
+FROM python:3.12.8-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY . /app/Instability
+
+WORKDIR /app/Instability
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y git && apt-get clean
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose FastAPI port
+EXPOSE 8000
+
+# Set default env var (optional: override using -e in docker run)
+ENV MONGO_URI=mongodb://host.docker.internal:27017
+
+# Run the app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
