@@ -1,6 +1,8 @@
 package com.example.afferentcoupling.controller;
 
 import com.example.afferentcoupling.model.AfferentCouplingData;
+import com.example.afferentcoupling.model.CouplingData;
+import com.example.afferentcoupling.model.ResponseObject;
 import com.example.afferentcoupling.service.AfferentCouplingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,9 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class AfferentCouplingControllerTest {
@@ -34,10 +39,10 @@ public class AfferentCouplingControllerTest {
         String repoUrl = "https://github.com/ronmamo/reflections";
         AfferentCouplingData mockData = new AfferentCouplingData();
         mockData.setRepoUrl(repoUrl);
-        
-        when(service.getCouplingData(repoUrl)).thenReturn(mockData);
 
-        ResponseEntity<AfferentCouplingData> response = controller.getCoupling(repoUrl);
+        when(service.getCouplingData(repoUrl)).thenReturn(List.of(mockData));
+
+        ResponseEntity<List<AfferentCouplingData>> response = controller.getCoupling(repoUrl);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(mockData, response.getBody());
         verify(service, times(1)).getCouplingData(repoUrl);
@@ -45,11 +50,11 @@ public class AfferentCouplingControllerTest {
 
     @Test
     public void testComputeFromGitHub_NoContent() {
-      
+
         String repoUrl = "https://github.com/user/repo";
         when(service.processGitHubRepo(repoUrl, null)).thenReturn(new HashMap<>());
-   
-        ResponseEntity<Map<String, Integer>> response = controller.computeFromGitHub(repoUrl, null);
+
+        ResponseEntity<ResponseObject> response = controller.computeFromGitHub(repoUrl, null);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
