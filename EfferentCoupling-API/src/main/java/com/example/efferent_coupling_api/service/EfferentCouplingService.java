@@ -50,6 +50,7 @@ public class EfferentCouplingService {
 
         repository.save(data);
         Map<String, Object> EfferentcouplingMap = new HashMap<>();
+        EfferentcouplingMap.put("timestamp", Instant.now().toString());
         EfferentcouplingMap.put("data", currentEfferentPayload);
         responseMap.put("current_efferent", EfferentcouplingMap);
 
