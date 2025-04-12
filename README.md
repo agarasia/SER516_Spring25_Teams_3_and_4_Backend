@@ -63,7 +63,7 @@ The system calculates:
 * Afferent Coupling (Ca): Measures the number of incoming dependencies. 
 * Efferent Coupling (Ce): Measures the number of outgoing dependencies.
 * Defect Density: Number of defects per lines of code.
-* Instability Metric(I): Measures how susceptible a software package is, to changes based on its outgoing dependencies.
+* Instability Metric(I): Measures how susceptible a software package is, to changes based on its outgoing dependencies. This service serves as composition service, takes input from Afferent and Efferent coupling services to calculate the instability of the given source code.
 * LCOM4 :  Measures methods of a class are related to each other via shared instance variables.
 * LCOMHS : Measures the number of methods and attributes, how often attributes are used across methods.
 * Defect score : A weighted average summaries of defect severity.
