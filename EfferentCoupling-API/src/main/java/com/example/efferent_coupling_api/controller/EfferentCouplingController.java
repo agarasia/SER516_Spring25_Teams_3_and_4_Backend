@@ -1,13 +1,13 @@
 package com.example.efferent_coupling_api.controller;
 
+import com.example.efferent_coupling_api.model.EfferentCouplingData;
 import com.example.efferent_coupling_api.service.EfferentCouplingService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
-
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 
 @CrossOrigin(origins = "*")
@@ -22,7 +22,14 @@ public class EfferentCouplingController {
     }
 
     @PostMapping("/analyze")
-    public Map<String, Integer> analyzeFromGitHub(@RequestParam("url") String repoUrl) throws Exception {
+    public ResponseEntity<Map<String, Object>> analyzeFromGitHub(@RequestParam("url") String repoUrl) throws Exception {
         return couplingService.processGitHubRepo(repoUrl);
     }
+
+    @GetMapping("/getall")
+    public ResponseEntity<List<EfferentCouplingData>> getAllData() {
+        
+        return couplingService.getDB_Data();
+    }
+
 }
