@@ -12,7 +12,7 @@ def compute_instability(a_data, e_data):
         instability = round(efferent / total, 4) if total != 0 else 0.0
         result.append({
             "class_name": class_name,
-            "instability": instability
+            "score": instability
         })
     return result
 
