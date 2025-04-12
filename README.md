@@ -88,11 +88,11 @@ The system calculates:
 ## 5. Contributors
 
 This project is a collaborative effort by the SER 516 Teams-3&4. If you have any questions or need assistance, please reach out to one of the team members:
-- Thrupthi Hosahalli Manjunatha (thosahal@asu.edu)
-- Smit Panchal (spanch19@asu.edu)
-- Hitesh Kolluru (hkolluru@asu.edu)
+- Thrupthi Hosahalli Manjunatha (@thrupthihm)
+- Smit Panchal (@Smit-Mahesh-Panchal)
+- Hitesh Kolluru (@HiteshKolluru)
 - Aniket Patil (@aapati17)
 - Aum Jitendra Garasia (@agarasia)
 - Satyam Shekhar (@sshekh30)
 - Uma Maheshwar Reddy N (@unallami)
-- Faisal Alaqal (falaqal@asu.edu)
+- Faisal Alaqal (@falaqal)
