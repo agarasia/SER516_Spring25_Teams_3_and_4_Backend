@@ -29,7 +29,7 @@ services:
     depends_on:
       - mongodb
   
-  defectdensityapi:
+  defectdensity-api:
     build:
       context: ./DefectDensity-API
     container_name: defectdensityapi
@@ -84,6 +84,26 @@ services:
     # If you only want the gateway to call it internally, you can omit the port mapping.
     # But let's keep it to show direct access for debugging.
   
+  benchmark:
+    build:
+      context: ./Benchmark
+      dockerfile: dockerfile
+    container_name: benchmark_container
+    ports:
+      - "8004:8000"   # host:container
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
+  instability:
+    build:
+      context: ./Instability
+      dockerfile: dockerfile
+    container_name: instability_container
+    ports:
+      - "8005:8000"   # host:container
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+
   gateway:
     build:
       context: ./middleware
@@ -94,11 +114,21 @@ services:
     environment:
       - LCOM4_SERVICE_URL=http://lcom4:8000
       - LCOMHS_SERVICE_URL=http://lcomhs:8000
-      - DEFECT_SCORE_SERVICE_URL=http://defectscore:8000/
+      - DEFECT_SCORE_SERVICE_URL=http://defectscore:8000
+      - BENCHMARK_SERVICE_URL=http://benchmark:8000
+      - INSTABILITY_SERVICE_URL=http://instability:8000
+      - AFFERENT_SERVICE_URL=http://afferent-api:8081
+      - EFFERENT_SERVICE_URL=http://efferent-api:8082
+      - DEFECTDENSITY_SERVICE_URL=http://defectdensity-api:8083
     depends_on:
       - lcom4
       - lcomhs
       - defectscore
+      - benchmark
+      - instability
+      - afferent-api
+      - efferent-api
+      - defectdensity-api
 
 volumes:
   mongo_data:

@@ -49,8 +49,6 @@ public class AfferentCouplingController {
                 .map(entry -> new CouplingData(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        // Save the coupling data to the database
-        service.saveCouplingData(repoUrl, result);
 
         AfferentCouplingData currComputedResult = new AfferentCouplingData();
         currComputedResult.setRepoUrl(repoUrl);
@@ -58,6 +56,8 @@ public class AfferentCouplingController {
         currComputedResult.setTimestamp(Instant.now().toString());
 
         ResponseObject responseObject = new ResponseObject(service.getCouplingData(repoUrl), currComputedResult);
+        // Save the coupling data to the database
+        service.saveCouplingData(repoUrl, result);
         return ResponseEntity.ok(responseObject);
     }
 

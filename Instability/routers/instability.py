@@ -9,7 +9,7 @@ from services.instability_service import process_instability
 router = APIRouter(prefix="/instability", tags=["metrics"])
 
 # POST /instability — calculate and store
-@router.post("/")
+@router.post("/calculate")
 async def calculate_instability(request: Request):
     payload = await request.json()
     return process_instability(payload)
