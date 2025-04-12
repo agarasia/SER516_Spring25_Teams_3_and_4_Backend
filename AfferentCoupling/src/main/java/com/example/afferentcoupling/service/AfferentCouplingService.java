@@ -91,6 +91,7 @@ public class AfferentCouplingService {
         Set<String> projectClasses = new HashSet<>();
 
         for (String fileContent : javaFiles) {
+            logger.debug("Processing file content: {}", fileContent);
             String className = extractClassName(fileContent);
             if (className != null) {
                 projectClasses.add(className);
@@ -98,6 +99,7 @@ public class AfferentCouplingService {
         }
 
         for (String fileContent : javaFiles) {
+            logger.debug("Processing file content for dependencies: {}", fileContent);
             String className = extractClassName(fileContent);
             if (className != null) {
                 Set<String> dependencies = extractDependencies(fileContent, projectClasses);
@@ -106,11 +108,14 @@ public class AfferentCouplingService {
         }
 
         for (String className : classDependencies.keySet()) {
+            logger.debug("Class: {}, Dependencies: {}", className, classDependencies.get(className));
             afferentCoupling.putIfAbsent(className, new HashSet<>());
         }
         for (Map.Entry<String, Set<String>> entry : classDependencies.entrySet()) {
             String dependentClass = entry.getKey();
+            logger.debug("Dependent Class: {}", dependentClass);
             for (String dependency : entry.getValue()) {
+                logger.debug("Dependency: {}", dependency);
                 afferentCoupling.putIfAbsent(dependency, new HashSet<>());
                 afferentCoupling.get(dependency).add(dependentClass);
             }
@@ -120,20 +125,15 @@ public class AfferentCouplingService {
         for (Map.Entry<String, Set<String>> entry : afferentCoupling.entrySet()) {
             result.put(entry.getKey(), entry.getValue().size());
         }
+
+        logger.info("Afferent coupling result: {}", result);
         return result;
     }
 
     private String extractClassName(String content) {
         Pattern pattern = Pattern.compile(CLASS_PATTERN, Pattern.DOTALL);
         Matcher matcher = pattern.matcher(content);
-        String className = matcher.find() ? matcher.group(1) + "." + matcher.group(2) : null;
-        if (className != null && className.contains(".")) {
-            className = className.split("\\W+")[className.split("\\W+").length - 1];
-            return className;
-        } else if (className != null) {
-            return className;
-        }
-        return null;
+        return matcher.find() ? matcher.group(1) + "." + matcher.group(2) : null;
     }
 
     private Set<String> extractDependencies(String content, Set<String> projectClasses) {

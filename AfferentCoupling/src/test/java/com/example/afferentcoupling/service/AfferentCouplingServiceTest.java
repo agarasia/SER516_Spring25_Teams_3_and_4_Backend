@@ -28,10 +28,11 @@ public class AfferentCouplingServiceTest {
     public void testGetCouplingData() {
         String repoUrl = "https://github.com/ronmamo/reflections";
 
-        AfferentCouplingData expectedData = new AfferentCouplingData();
-        expectedData.setRepoUrl(repoUrl);
-
-        when(repository.findByRepoUrl(repoUrl)).thenReturn(List.of(expectedData));
+        AfferentCouplingData afferendData = new AfferentCouplingData();
+        afferendData.setRepoUrl(repoUrl);
+        List<AfferentCouplingData> expectedData = new ArrayList<>();
+        expectedData.add(afferendData);
+        when(repository.findByRepoUrl(repoUrl)).thenReturn(expectedData);
         List<AfferentCouplingData> actualData = service.getCouplingData(repoUrl);
         assertEquals(expectedData, actualData);
         verify(repository, times(1)).findByRepoUrl(repoUrl);
@@ -41,8 +42,8 @@ public class AfferentCouplingServiceTest {
     public void testSaveCouplingData() {
         String repoUrl = "https://github.com/user/repo";
         Map<String, Integer> couplingData = new HashMap<>();
-        couplingData.put("com.example.Class1", 3);
-        couplingData.put("com.example.Class2", 1);
+        couplingData.put("Class1", 3);
+        couplingData.put("Class2", 1);
 
         ArgumentCaptor<AfferentCouplingData> dataCaptor = ArgumentCaptor.forClass(AfferentCouplingData.class);
 
@@ -89,7 +90,7 @@ public class AfferentCouplingServiceTest {
                         "}\n",
 
                 "package com.example.test;\n" +
-                        "import com.example.test.ClassA;\n" +
+                        "import ClassA;\n" +
                         "import com.example.test.ClassB;\n" +
                         "public class ClassC {\n" +
                         "    private ClassA classA;\n" +
@@ -102,9 +103,9 @@ public class AfferentCouplingServiceTest {
 
         assertNotNull(result);
         assertEquals(3, result.size());
-        assertEquals(2, result.get("ClassA"));
-        assertEquals(2, result.get("ClassB"));
-        assertEquals(0, result.get("ClassC"));
+        assertEquals(1, result.get("com.example.test.ClassA"));
+        assertEquals(2, result.get("com.example.test.ClassB"));
+        assertEquals(0, result.get("com.example.test.ClassC"));
     }
 
 }

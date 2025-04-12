@@ -62,7 +62,7 @@ public class AfferentCouplingControllerTest {
         String repoUrl = "https://github.com/ronmamo/reflections";
 
         // Mock the service to return an empty list
-        when(service.getCouplingData(repoUrl)).thenReturn(new ArrayList<>());
+        when(service.getCouplingData(repoUrl)).thenReturn(null);
 
         // Call the controller method
         ResponseEntity<List<AfferentCouplingData>> response = controller.getCoupling(repoUrl);
