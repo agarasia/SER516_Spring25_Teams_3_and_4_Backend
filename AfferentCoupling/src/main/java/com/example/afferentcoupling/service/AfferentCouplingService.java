@@ -1,9 +1,9 @@
 package com.example.afferentcoupling.service;
 
 import org.eclipse.jgit.api.Git;
-
+import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,14 +17,25 @@ public class AfferentCouplingService {
     private static final String IMPORT_PATTERN = "import\\s+([\\w\\.]+);";
 
     public Map<String, Integer> processGitHubRepo(String repoUrl) {
+        return processGitHubRepo(repoUrl, null);
+    }
+
+    public Map<String, Integer> processGitHubRepo(String repoUrl, String token) {
         File tempDir;
         try {
             tempDir = Files.createTempDirectory("repo").toFile();
-            Git.cloneRepository()
+            
+            CloneCommand cloneCommand = Git.cloneRepository()
                     .setURI(repoUrl)
-                    .setDirectory(tempDir)
-                    .call();
-
+                    .setDirectory(tempDir);
+            
+            // Authentication if token is provided
+            if (token != null && !token.isEmpty()) {
+                cloneCommand.setCredentialsProvider(
+                    new UsernamePasswordCredentialsProvider(token, "")
+                );
+            }
+            cloneCommand.call();
             List<String> javaFiles = new ArrayList<>();
             Files.walk(tempDir.toPath())
                     .filter(path -> path.toString().endsWith(".java"))

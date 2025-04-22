@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.time.Instant;
-
 import java.util.Map;
 
 @RestController
@@ -18,11 +17,12 @@ public class AfferentCouplingController {
     private AfferentCouplingService service;
 
     @PostMapping("/coupling/github")
-    public ResponseEntity<Map<String, Integer>> computeFromGitHub(@RequestParam String repoUrl) {
-        Map<String, Integer> result = service.processGitHubRepo(repoUrl);
+    public ResponseEntity<Map<String, Integer>> computeFromGitHub(
+            @RequestParam String repoUrl,
+            @RequestParam(required = false) String token) {
+        Map<String, Integer> result = service.processGitHubRepo(repoUrl, token);
         return ResponseEntity.ok(result);
     }
-
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
