@@ -22,9 +22,6 @@ This guide provides instructions on how to run the DefectDensity-API application
    - **Variable Name:** `url`
    - **Expected Input Value:** A Github repository URL
 
-## Building and Running with Docker
-
-### Prerequisites 
 
 
 ### Building the Docker Container
