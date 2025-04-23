@@ -1,6 +1,6 @@
 package com.example.efferent_coupling_api.controller;
 
-import com.example.efferent_coupling_api.model.ClassScoreModel;
+// import com.example.efferent_coupling_api.model.ClassScoreModel;
 import com.example.efferent_coupling_api.service.EfferentCouplingService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,10 +32,10 @@ class EfferentCouplingControllerTest {
 
         // Build a fake response matching the service's expected return type.
         Map<String, Object> fakeResponseData = new HashMap<>();
-        List<ClassScoreModel> classScores = new ArrayList<>();
-        classScores.add(new ClassScoreModel("com.example.MyClass", 3));
-        fakeResponseData.put("classScores", classScores);
-        ResponseEntity<Map<String, Object>> expectedResponse = ResponseEntity.ok(fakeResponseData);
+        // List<ClassScoreModel> classScores = new ArrayList<>();
+        // classScores.add(new ClassScoreModel("com.example.MyClass", 3));
+        // fakeResponseData.put("classScores", classScores);
+        // ResponseEntity<Map<String, Object>> expectedResponse = ResponseEntity.ok(fakeResponseData);
 
         // Stub the service to return a correct ResponseEntity.
         when(couplingService.processGitHubRepo(repoUrl)).thenReturn(expectedResponse);

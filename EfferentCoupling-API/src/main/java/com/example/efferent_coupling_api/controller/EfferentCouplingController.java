@@ -1,6 +1,6 @@
 package com.example.efferent_coupling_api.controller;
 
-import com.example.efferent_coupling_api.model.EfferentCouplingData;
+// import com.example.efferent_coupling_api.model.EfferentCouplingData;
 import com.example.efferent_coupling_api.service.EfferentCouplingService;
 
 import org.springframework.http.ResponseEntity;
@@ -26,10 +26,10 @@ public class EfferentCouplingController {
         return couplingService.processGitHubRepo(repoUrl);
     }
 
-    @GetMapping("/getall")
-    public ResponseEntity<List<EfferentCouplingData>> getAllData() {
+    // @GetMapping("/getall")
+    // public ResponseEntity<List<EfferentCouplingData>> getAllData() {
         
-        return couplingService.getDB_Data();
-    }
+    //     return couplingService.getDB_Data();
+    // }
 
 }
