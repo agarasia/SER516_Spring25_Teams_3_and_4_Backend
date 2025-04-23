@@ -1,15 +1,10 @@
 package com.defectdensityapi.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
-@Document(collection = "defect_density_history")
 public class DefectDensityHistory {
 
-    @Id
-    private String id;                  // MongoDB document ID
-    private String repoUrl;             // e.g., "owner/repo"
+    private String repoUrl;             // owner/repo
     private double defectDensity;       // The calculated defect density
     private LocalDateTime timestamp;    // Time when the density was recorded
 
@@ -23,10 +18,6 @@ public class DefectDensityHistory {
     }
 
     // Getters and setters
-    public String getId() {
-        return id;
-    }
-
     public String getRepoUrl() {
         return repoUrl;
     }
