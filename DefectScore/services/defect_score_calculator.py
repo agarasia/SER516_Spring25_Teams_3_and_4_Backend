@@ -1,5 +1,18 @@
 import requests
 import math
+from datetime import datetime 
+
+
+#fallback
+def fetch_label_mapping_from_mongo(repo_url: str) -> list:
+    return [
+        {"key": "bug", "value": 2},
+        {"key": "minor", "value": 2},
+        {"key": "major", "value": 4},
+        {"key": "critical", "value": 5},
+        {"key": "high", "value": 5},
+        {"key": "low", "value": 1}
+    ]
 
 
 def compute_defect_score_from_github(repo_url: str, token: str = None) -> dict:
