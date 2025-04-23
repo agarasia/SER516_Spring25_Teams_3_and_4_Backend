@@ -1,6 +1,6 @@
 import requests
 import math
-from services.mongo_service import fetch_label_mapping_from_mongo
+
 
 def compute_defect_score_from_github(repo_url: str, token: str = None) -> dict:
     """
