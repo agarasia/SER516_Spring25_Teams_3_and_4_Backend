@@ -42,9 +42,9 @@ async def calculate_defect_score(
         current_timestamp = datetime.utcfromtimestamp(time.time()).isoformat() + "Z"
 
         current_data = {
-            "timestamp": current_timestamp,
-            "data": result,
-            "gitUniqueId": sourceValue   
+            "timestamp": current_timestamp, #keep this
+            "data": result, #
+            "gitUniqueId": sourceValue #change to project name    
         }
 
         #store_def_score_data_in_mongo(sourceValue, result)
