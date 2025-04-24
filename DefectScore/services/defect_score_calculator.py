@@ -3,7 +3,7 @@ import math
 from datetime import datetime 
 
 
-#fallback
+#fallback - needs more info on this 
 def fetch_label_mapping_from_mongo(repo_url: str) -> list:
     return [
         {"key": "bug", "value": 2},

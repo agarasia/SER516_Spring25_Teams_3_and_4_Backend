@@ -2,12 +2,6 @@ import os
 from fastapi import APIRouter, HTTPException, Form, Body, Query
 from typing import Optional, List
 from services.defect_score_calculator import compute_defect_score_from_github
-#from services.mongo_service import to_doc_id,store_label_mapping_in_mongo,\
-#    fetch_label_mapping_from_mongo, \
-#    store_def_score_data_in_mongo, \
-#    fetch_def_score_data_from_mongo, \
-#    store_benchmark_in_mongo, \
-#    get_benchmark_from_mongo
 from datetime import datetime
 import time
 
