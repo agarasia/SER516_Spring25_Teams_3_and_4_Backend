@@ -13,7 +13,6 @@ import time
 
 router = APIRouter()
 label_mappings = {}
-benchmarks = {}
 
 @router.post("/calculate")
 async def calculate_defect_score(
@@ -38,19 +37,16 @@ async def calculate_defect_score(
         # Compute the defect score from the GH Issues
         result = compute_defect_score_from_github(sourceValue, token)
 
-        history_data = []
         current_timestamp = datetime.utcfromtimestamp(time.time()).isoformat() + "Z"
 
         current_data = {
             "timestamp": current_timestamp, #keep this
             "data": result, #
-            "gitUniqueId": sourceValue #change to project name    
+            "gitUniqueId": sourceValue #change to project name    "project_name" : sourceValue
         }
 
-        #store_def_score_data_in_mongo(sourceValue, result)
 
-        return { "defect_score_history": history_data ,
-                 "current_defect_score": current_data }
+        return current_data
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -107,30 +103,4 @@ def fetch_labels_for_project(
         return label_mapping
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-@router.post("/benchmark")
-def store_labels_for_project(
-    sourceValue: str = Body(..., example="https://github.com/owner/repo"),
-    benchmark: float = Body(..., example=1)
-):
-    """
-    Stores custom benchmark -> user entered bench mark in mongo for a given repo URL.
-    """
-    try:
-        benchmarks[sourceValue] = benchmark
-        return {"message": "benchmark stored successfully."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/benchmark")
-def store_labels_for_project(
-    sourceValue: str = Query(..., example="https://github.com/owner/repo")
-):
-    """
-    get benchmark -> benchmark from mongo for a given repo URL.
-    """
-    try:
-        benchmark = benchmarks.get(sourceValue, 0)
-        return {"defect_score_benchmark": benchmark}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
