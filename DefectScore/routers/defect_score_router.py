@@ -28,15 +28,24 @@ async def calculate_defect_score(
         if not token:
             token = os.getenv("GITHUB_TOKEN", None)
 
+        label_mapping = label_mappings.get(sourceValue, [
+            {"key": "bug", "value": 2},
+            {"key": "minor", "value": 2},
+            {"key": "major", "value": 4},
+            {"key": "critical", "value": 5},
+            {"key": "high", "value": 5},
+            {"key": "low", "value": 1}
+        ])
+
         # Compute the defect score from the GH Issues
-        result = compute_defect_score_from_github(sourceValue, token)
+        result = compute_defect_score_from_github(sourceValue, token,label_mapping)
 
         current_timestamp = datetime.utcfromtimestamp(time.time()).isoformat() + "Z"
 
         current_data = {
-            "timestamp": current_timestamp, #keep this
-            "data": result, #
-            "gitUniqueId": sourceValue #change to project name    "project_name" : sourceValue
+            "timestamp": current_timestamp,
+            "data": result, 
+            "gitUniqueId": sourceValue 
         }
 
 
