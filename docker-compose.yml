@@ -35,11 +35,6 @@ services:
     container_name: defectdensityapi
     ports:
       - "8083:8083"
-    environment:
-      # Point URI at 'mongodb', because that's the service name
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/defectdensitydb
-    depends_on:
-      - mongodb
 
   lcom4:
     build:
