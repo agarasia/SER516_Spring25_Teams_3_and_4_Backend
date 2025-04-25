@@ -2,7 +2,7 @@
 
 This guide provides instructions on how to run the Efferent Coupling API application both locally and using Docker.
 
----
+<!-- ---
 
 ## 🛠️ MongoDB Setup Using Docker
 
@@ -24,7 +24,7 @@ This will:
 - Name the container `mongo-container`
 - Set the default database to `efferent_coupling_db`
 
-> By default, the Spring Boot app connects to `mongodb://localhost:27017/efferent_coupling_db`. No extra config needed unless overridden.
+> By default, the Spring Boot app connects to `mongodb://localhost:27017/efferent_coupling_db`. No extra config needed unless overridden. -->
 
 ---
 
@@ -83,17 +83,15 @@ mvn clean package
 docker build --build-arg JAR_FILE=target/efferent-coupling-api-0.0.1-SNAPSHOT.jar -t efferent-coupling-api .
 ```
 
-### Running the Docker Container (Connected to MongoDB)
+### Running the Docker Container
 
 ```bash
 docker run -d -p 8082:8082 --name efferent-coupling-api \
-  --link mongo-container \
-  -e MONGO_URI=mongodb://mongo-container:27017/efferent_coupling_db \
   efferent-coupling-api
 ```
-
+<!-- 
 > The `--link` connects your app container with the MongoDB container using an internal hostname (`mongo-container`).
-> The database name is set as `efferent_coupling_db`.
+> The database name is set as `efferent_coupling_db`. -->
 
 
 ### Stopping the Container
