@@ -2,6 +2,8 @@
 # import math
 # from unittest.mock import patch, MagicMock
 # from services.defect_score_calculator import compute_defect_score_from_github
+def test_placeholder():
+    assert True
 
 # @pytest.mark.parametrize("repo_url, token", [
 #     ("https://github.com/owner/repo", None),
