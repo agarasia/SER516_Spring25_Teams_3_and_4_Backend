@@ -6,7 +6,6 @@ from typing import Optional
 
 from services.lcom4_calculator import calculate_lcom4
 from services.project_parser import parse_java_files_in_dir
-from services.github_service import fetch_project_from_github, cleanup_dir
 from datetime import datetime
 import time
 
@@ -47,6 +46,8 @@ async def calculate_lcom4_endpoint(
         for cls in java_classes:
             lcom4_value = calculate_lcom4(cls)
             results.append({"class_name": cls.name, "score": lcom4_value})
+
+
         current_timestamp = datetime.utcfromtimestamp(time.time()).isoformat() + "Z"
 
         response = {
@@ -59,9 +60,3 @@ async def calculate_lcom4_endpoint(
     except Exception as e:
         # Wrap any exceptions in an HTTP 500
         raise HTTPException(status_code=500, detail=str(e))
-
-    finally:
-        # Cleanup temp files and directories
-        if temp_dir:
-            cleanup_dir(temp_dir)
-
