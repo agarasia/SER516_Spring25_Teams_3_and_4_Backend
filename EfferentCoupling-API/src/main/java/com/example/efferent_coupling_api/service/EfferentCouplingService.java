@@ -1,4 +1,5 @@
 package com.example.efferent_coupling_api.service;
+import utilities.RepoFetcher;
 
 import com.example.efferent_coupling_api.util.JavaParserUtil;
 import com.example.efferent_coupling_api.util.FetchRepoPythonCaller;
@@ -20,10 +21,18 @@ public class EfferentCouplingService {
     private static final String CLONE_DIR = "cloned-repos/";
 
     public ResponseEntity<Map<String, Object>> processGitHubRepo(String repoUrl) throws Exception {
-        FetchRepoPythonCaller.FetchRepoResult fetchResult = FetchRepoPythonCaller.fetchRepo(repoUrl);
-        File clonedRepo = new File(fetchResult.repoPath);
+        RepoFetcher.FetchResult fetchResult = RepoFetcher.fetchRepo(repoUrl);
 
-        Map<String, Integer> result = JavaParserUtil.computeEfferentCoupling(clonedRepo);
+        if (fetchResult.error != null) {
+            // If not cloned yet, return an error to the client
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", fetchResult.error);
+            return ResponseEntity.ok(errorResponse);
+        }
+
+
+        File repoDir = new File(fetchResult.repoDir);
+        Map<String, Integer> result = JavaParserUtil.computeEfferentCoupling(repoDir);
 
 
         Map<String, Object> responseMap = new HashMap<>();
