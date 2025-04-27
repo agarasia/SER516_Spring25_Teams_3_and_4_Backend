@@ -21,13 +21,13 @@ services:
   efferent-api:
     build:
       context: ./EfferentCoupling-API
+      args:
+        SERVICE_NAME: efferent
     container_name: efferent-api-container
     ports:
       - "8082:8082"
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/efferent_coupling_db
-    depends_on:
-      - mongodb
+    volumes:
+      - shared-repos:/shared/repos
   
   defectdensity-api:
     build:
