@@ -1,8 +1,21 @@
 import requests
 import math
-from services.mongo_service import fetch_label_mapping_from_mongo
+from datetime import datetime 
 
-def compute_defect_score_from_github(repo_url: str, token: str = None) -> dict:
+
+#fallback - needs more info on this 
+# def fetch_label_mapping_from_mongo(repo_url: str) -> list:
+#     return [
+#         {"key": "bug", "value": 2},
+#         {"key": "minor", "value": 2},
+#         {"key": "major", "value": 4},
+#         {"key": "critical", "value": 5},
+#         {"key": "high", "value": 5},
+#         {"key": "low", "value": 1}
+#     ]
+
+
+def compute_defect_score_from_github(repo_url: str, token: str = None, label_severity_data: list = None) -> dict:
     """
     Fetch issues from a GitHub repository and calculate a defect score.
 
@@ -27,8 +40,7 @@ def compute_defect_score_from_github(repo_url: str, token: str = None) -> dict:
         raise ValueError("Invalid GitHub URL. Expected 'https://github.com/owner/repo'")
     owner, repo = path_parts[0], path_parts[1]
 
-    # Get labelMapping from Firebase
-    label_severity_data = fetch_label_mapping_from_mongo(repo_url)
+    
     # Build the GitHub Issues API endpoint
     issues_api_url = f"https://api.github.com/repos/{owner}/{repo}/issues"
 
@@ -55,6 +67,8 @@ def compute_defect_score_from_github(repo_url: str, token: str = None) -> dict:
 
     # We will gather a list of severities from any issues that appear to be "defects"
     defect_severities = []
+    label_severity_map = {entry["key"]: float(entry["value"]) for entry in label_severity_data}
+
     
     for issue in issues:
         labels = issue.get("labels", [])
@@ -63,9 +77,7 @@ def compute_defect_score_from_github(repo_url: str, token: str = None) -> dict:
         # For each label, see if it maps to a known severity
         # Pick the MAX severity found among labels on this issue or skip if none matches
         issue_severity = 0
-        label_severity_map = {}
-        for data in label_severity_data:
-            label_severity_map[data["key"]] = float(data["value"])
+        
         for lname in label_names:
             if lname in label_severity_map:
                 issue_severity = max(issue_severity, label_severity_map[lname])
