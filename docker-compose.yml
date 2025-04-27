@@ -41,12 +41,14 @@ services:
       context: ./LCOM4
       dockerfile: dockerfile
     container_name: lcom4_container
-    depends_on:
-      - mongodb
+    # depends_on:
+    #   - mongodb
     ports:
       - "8001:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+    # environment:
+    #   - MONGO_URI=mongodb://mongodb:27017/
+    volumes:
+      - shared-repos:/shared/repos
     # If you only want the gateway to call it internally, you can omit the port mapping.
     # But let's keep it to show direct access for debugging.
 
@@ -127,3 +129,4 @@ services:
 
 volumes:
   mongo_data:
+  shared-repos:

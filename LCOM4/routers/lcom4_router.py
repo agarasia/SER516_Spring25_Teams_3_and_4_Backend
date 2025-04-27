@@ -1,11 +1,13 @@
-from fastapi import APIRouter, HTTPException, Form, Body, Query
+from fastapi import APIRouter, HTTPException, Form, Body, Query 
 from typing import Optional
 
 from services.lcom4_calculator import calculate_lcom4
 from services.project_parser import parse_java_files_in_dir
-from services.github_service import fetch_project_from_github, cleanup_dir
+from services.shared_volume_service import fetch_project_from_shared_volume
+from flask import jsonify
 from datetime import datetime
 import time
+import git
 
 router = APIRouter()
 
@@ -26,18 +28,22 @@ async def calculate_lcom4_endpoint(
     Response:
       - JSON object with LCOM4 results for each Java class.
     """
-    temp_dir = None
 
-    # Fetch or Unzip the project
+    # Get the project from Shared Volune
     try:
         if not gitHubLink:
             raise HTTPException(status_code=400, detail="Please provide a GitHub URL in gitHubLink.")
             
         # Clone the GitHub repo to a temp directory
-        temp_dir = fetch_project_from_github(gitHubLink)
+        head_sha, repo_path = fetch_project_from_shared_volume(gitHubLink)
+
+        repo_dir = git.Repo(repo_path) 
+        
+        if isinstance(repo_dir, dict) and "error" in repo_dir:
+            return jsonify({"error": repo_dir["error"]}), 200
 
         # Parse .java files and compute LCOM4
-        java_classes = parse_java_files_in_dir(temp_dir)
+        java_classes = parse_java_files_in_dir(repo_dir)
         results = []
         for cls in java_classes:
             lcom4_value = calculate_lcom4(cls)
@@ -55,8 +61,4 @@ async def calculate_lcom4_endpoint(
     except Exception as e:
         # Wrap any exceptions in an HTTP 500
         raise HTTPException(status_code=500, detail=str(e))
-
-    finally:
-        # Cleanup temp files and directories
-        if temp_dir:
-            cleanup_dir(temp_dir)
+    
