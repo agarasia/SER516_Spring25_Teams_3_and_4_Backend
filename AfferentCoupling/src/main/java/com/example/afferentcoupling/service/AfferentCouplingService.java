@@ -46,40 +46,7 @@ public class AfferentCouplingService {
             throw new RuntimeException("Error processing GitHub repo: " + e.getMessage());
         }
     }
-
-    public Map<String, Integer> processGitHubRepo(String repoUrl, String token) {
-        File tempDir;
-        try {
-            tempDir = Files.createTempDirectory("repo").toFile();
-            
-            CloneCommand cloneCommand = Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setDirectory(tempDir);
-            
-            // Authentication if token is provided
-            if (token != null && !token.isEmpty()) {
-                cloneCommand.setCredentialsProvider(
-                    new UsernamePasswordCredentialsProvider(token, "")
-                );
-            }
-            cloneCommand.call();
-            List<String> javaFiles = new ArrayList<>();
-            Files.walk(tempDir.toPath())
-                    .filter(path -> path.toString().endsWith(".java"))
-                    .forEach(path -> {
-                        try {
-                            javaFiles.add(Files.readString(path));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
-
-            return computeCoupling(javaFiles);
-        } catch (Exception e) {
-            throw new RuntimeException("Error processing GitHub repo: " + e.getMessage());
-        }
-    }
-
+    
     private Map<String, Integer> computeCoupling(List<String> javaFiles) {
         Map<String, Set<String>> classDependencies = new HashMap<>();
         Map<String, Set<String>> afferentCoupling = new HashMap<>();

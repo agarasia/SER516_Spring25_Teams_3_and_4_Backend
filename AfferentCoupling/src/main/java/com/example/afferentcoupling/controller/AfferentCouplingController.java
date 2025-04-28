@@ -26,11 +26,7 @@ public class AfferentCouplingController {
 
         String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
         try {
-            // Call single-arg if no token, otherwise remote clone path
-            Map<String, Integer> couplingResult =
-                    (token == null || token.isBlank())
-                            ? service.processGitHubRepo(repoUrl)
-                            : service.processGitHubRepo(repoUrl, token);
+            Map<String, Integer> couplingResult = service.processGitHubRepo(repoUrl);
 
             // Build successful response
             Map<String, Object> response = new LinkedHashMap<>();
