@@ -1,9 +1,10 @@
+from services.shared_volume_service import fetch_repo
+# from services.shared_volume_service import clone_repo
 from fastapi import APIRouter, HTTPException, Form,  Body, Query
 from typing import Optional
 
 from services.lcomhs_calculator import calculate_lcomhs
 from services.project_parser import parse_java_files_in_dir
-from services.github_service import fetch_project_from_github, cleanup_dir
 from datetime import datetime
 import time
 
@@ -33,8 +34,10 @@ async def calculate_lcomhs_endpoint(
         if not gitHubLink:
             raise HTTPException(status_code=400, detail="Please provide a GitHub URL in gitHubLink.")
 
-        # Clone the GitHub repo to a temp directory
-        temp_dir = fetch_project_from_github(gitHubLink)
+        # headsh1, dir_path = clone_repo(gitHubLink)  # un comment this line and clone_repo for testing
+
+        # fetch the GitHub repo from shared volume
+        headsh, temp_dir = fetch_repo(gitHubLink)
 
         # Parse .java files and compute LCOMHS
         java_classes = parse_java_files_in_dir(temp_dir)
@@ -54,8 +57,3 @@ async def calculate_lcomhs_endpoint(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-    finally:
-        if temp_dir:
-            cleanup_dir(temp_dir)
-
