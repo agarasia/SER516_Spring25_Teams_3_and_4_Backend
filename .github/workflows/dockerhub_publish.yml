@@ -2,8 +2,13 @@ name: Publish Metrics Services to Docker Hub
 
 on:
   push:
+    branches:
+      - "*"          
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"   
+  pull_request:
+    branches:
+      - "*"       
   release:
     types: [published]
 
