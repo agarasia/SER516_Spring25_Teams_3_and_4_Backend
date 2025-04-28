@@ -2,15 +2,15 @@ name: Publish Metrics Services to Docker Hub
 
 on:
   push:
-    branches:
-      - "*"          
-    tags:
-      - "v*.*.*"   
+    branches: ["*"]
   pull_request:
-    branches:
-      - "*"       
-  release:
-    types: [published]
+    branches: ["*"]
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release Version (e.g., v1.0.0)'
+        required: true
+        type: string
 
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -19,62 +19,75 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - service: instability
-            context: Instability
-            dockerfile: dockerfile
-          - service: defect-score
-            context: DefectScore
-            dockerfile: dockerfile
-          - service: lcomhs
-            context: LCOMHS
-            dockerfile: dockerfile
-          - service: lcom4
-            context: LCOM4
-            dockerfile: dockerfile
-          - service: defect-density
-            context: DefectDensity-API
-            dockerfile: Dockerfile
-          - service: afferent-coupling
-            context: AfferentCoupling
-            dockerfile: Dockerfile
-          - service: efferent-coupling
-            context: EfferentCoupling-API
-            dockerfile: Dockerfile
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract release tag
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
-      
-      - name: Determine image tags
-        id: image_tags
+      - name: Build Docker Images
         run: |
-          if [[ "${GITHUB_EVENT_NAME}" == "release" ]] || [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "tags=${{ env.DOCKERHUB_USERNAME }}/${{ matrix.service }}:${RELEASE_TAG},${{ env.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest" >> $GITHUB_OUTPUT
-          else
-            echo "tags=${{ env.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest" >> $GITHUB_OUTPUT
-          fi
+          docker build -t app-instability Instability -f Instability/dockerfile
+          docker build -t app-defect-score DefectScore -f DefectScore/dockerfile
+          docker build -t app-lcomhs LCOMHS -f LCOMHS/dockerfile
+          docker build -t app-lcom4 LCOM4 -f LCOM4/dockerfile
+          docker build -t app-defect-density DefectDensity-API -f DefectDensity-API/Dockerfile
+          docker build -t app-afferent-coupling AfferentCoupling -f AfferentCoupling/Dockerfile
+          docker build -t app-efferent-coupling EfferentCoupling-API -f EfferentCoupling-API/Dockerfile
 
-      - name: Build & Push ${{ matrix.service }}
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ${{ matrix.context }}/${{ matrix.dockerfile }}
-          push: true
-          tags: ${{ steps.image_tags.outputs.tags }}
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ env.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Tag and Push Images
+        run: |
+          # Choose version: on manual dispatch use input, otherwise 'latest'
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.release_version }}"
+          else
+            VERSION="latest"
+          fi
+          echo "Using version: $VERSION"
+
+          # Instability
+          docker tag app-instability ${{ env.DOCKERHUB_USERNAME }}/app-instability:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-instability:latest
+          docker tag app-instability ${{ env.DOCKERHUB_USERNAME }}/app-instability:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-instability:$VERSION
+
+          # Defect Score
+          docker tag app-defect-score ${{ env.DOCKERHUB_USERNAME }}/app-defect-score:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-defect-score:latest
+          docker tag app-defect-score ${{ env.DOCKERHUB_USERNAME }}/app-defect-score:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-defect-score:$VERSION
+
+          # LCOMHS
+          docker tag app-lcomhs ${{ env.DOCKERHUB_USERNAME }}/app-lcomhs:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-lcomhs:latest
+          docker tag app-lcomhs ${{ env.DOCKERHUB_USERNAME }}/app-lcomhs:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-lcomhs:$VERSION
+
+          # LCOM4
+          docker tag app-lcom4 ${{ env.DOCKERHUB_USERNAME }}/app-lcom4:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-lcom4:latest
+          docker tag app-lcom4 ${{ env.DOCKERHUB_USERNAME }}/app-lcom4:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-lcom4:$VERSION
+
+          # Defect Density
+          docker tag app-defect-density ${{ env.DOCKERHUB_USERNAME }}/app-defect-density:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-defect-density:latest
+          docker tag app-defect-density ${{ env.DOCKERHUB_USERNAME }}/app-defect-density:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-defect-density:$VERSION
+
+          # Afferent Coupling
+          docker tag app-afferent-coupling ${{ env.DOCKERHUB_USERNAME }}/app-afferent-coupling:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-afferent-coupling:latest
+          docker tag app-afferent-coupling ${{ env.DOCKERHUB_USERNAME }}/app-afferent-coupling:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-afferent-coupling:$VERSION
+
+          # Efferent Coupling
+          docker tag app-efferent-coupling ${{ env.DOCKERHUB_USERNAME }}/app-efferent-coupling:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-efferent-coupling:latest
+          docker tag app-efferent-coupling ${{ env.DOCKERHUB_USERNAME }}/app-efferent-coupling:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-efferent-coupling:$VERSION
