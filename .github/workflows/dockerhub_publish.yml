@@ -61,14 +61,13 @@ jobs:
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ env.DOCKERHUB_TOKEN }}
+      
       - name: Determine image tags
         id: image_tags
         run: |
-          # if this is a tag‐push or release event, use both $RELEASE_TAG & latest
-          if [[ "${GITHUB_EVENT_NAME}" == "release" || "${GITHUB_REF}" == refs/tags/* ]]; then
+          if [[ "${GITHUB_EVENT_NAME}" == "release" ]] || [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "tags=${{ env.DOCKERHUB_USERNAME }}/${{ matrix.service }}:${RELEASE_TAG},${{ env.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest" >> $GITHUB_OUTPUT
           else
-            # on branch pushes and PRs, only push latest
             echo "tags=${{ env.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest" >> $GITHUB_OUTPUT
           fi
 
