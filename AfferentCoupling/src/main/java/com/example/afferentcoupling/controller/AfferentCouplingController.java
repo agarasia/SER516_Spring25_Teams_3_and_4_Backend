@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/afferent")
 public class AfferentCouplingController {
 
     @Autowired
     private AfferentCouplingService service;
 
-    @PostMapping("/coupling/github")
+    @PostMapping("/github")
     public ResponseEntity<Map<String, Object>> computeFromGitHub(
             @RequestParam String repoUrl,
             @RequestParam(required = false) String token) {

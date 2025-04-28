@@ -3,6 +3,7 @@ package com.example.afferentcoupling.service;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,8 @@ public class AfferentCouplingService {
             RepoFetcher.FetchResult fetchResult = RepoFetcher.fetchRepo(repoUrl);
 
             if (fetchResult.error != null) {
-                throw new RuntimeException("Repo not found: " + fetchResult.error);
+                Map<String, Integer> body = Collections.singletonMap(fetchResult.error, 404);
+                return body;
             }
 
             File repoDirectory = new File(fetchResult.repoDir);

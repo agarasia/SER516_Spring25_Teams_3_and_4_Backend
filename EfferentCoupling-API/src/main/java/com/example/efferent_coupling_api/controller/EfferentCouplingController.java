@@ -12,7 +12,7 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 
 @RestController
-@RequestMapping("/api/efferent-coupling")
+@RequestMapping("/efferent")
 public class EfferentCouplingController {
     private final EfferentCouplingService couplingService;
 

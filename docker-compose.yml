@@ -9,7 +9,8 @@ services:
 
   afferent-api:
     build:
-      context: ./AfferentCoupling
+      context: .                            
+      dockerfile: AfferentCoupling/Dockerfile
     container_name: afferent-api-container
     ports:
       - "8081:8081"
@@ -18,7 +19,8 @@ services:
   
   efferent-api:
     build:
-      context: ./EfferentCoupling-API
+      context: .
+      dockerfile: EfferentCoupling-API/Dockerfile
       args:
         SERVICE_NAME: efferent
     container_name: efferent-api-container
