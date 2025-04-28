@@ -11,13 +11,40 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import utilities.RepoFetcher;
+
 @Service
 public class AfferentCouplingService {
     private static final String CLASS_PATTERN = "package\\s+([\\w\\.]+);.*?class\\s+(\\w+)";
     private static final String IMPORT_PATTERN = "import\\s+([\\w\\.]+);";
 
     public Map<String, Integer> processGitHubRepo(String repoUrl) {
-        return processGitHubRepo(repoUrl, null);
+        // return processGitHubRepo(repoUrl, null);
+        try {
+            // Use RepoFetcher to check if repo already exists
+            RepoFetcher.FetchResult fetchResult = RepoFetcher.fetchRepo(repoUrl);
+
+            if (fetchResult.error != null) {
+                throw new RuntimeException("Repo not found: " + fetchResult.error);
+            }
+
+            File repoDirectory = new File(fetchResult.repoDir);
+
+            List<String> javaFiles = new ArrayList<>();
+            Files.walk(repoDirectory.toPath())
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .forEach(path -> {
+                        try {
+                            javaFiles.add(Files.readString(path));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+            return computeCoupling(javaFiles);
+        } catch (Exception e) {
+            throw new RuntimeException("Error processing GitHub repo: " + e.getMessage());
+        }
     }
 
     public Map<String, Integer> processGitHubRepo(String repoUrl, String token) {
