@@ -9,14 +9,14 @@ services:
 
   afferent-api:
     build:
-      context: .                            
+      context: .
       dockerfile: AfferentCoupling/Dockerfile
     container_name: afferent-api-container
     ports:
       - "8081:8081"
     volumes:
       - shared-repos:/shared/repos
-  
+
   efferent-api:
     build:
       context: .
@@ -28,7 +28,7 @@ services:
       - "8082:8082"
     volumes:
       - shared-repos:/shared/repos
-  
+
   defectdensity-api:
     build:
       context: ./DefectDensity-API
@@ -44,7 +44,7 @@ services:
     # depends_on:
     #   - mongodb
     ports:
-      - "8001:8000"   # host:container
+      - "8001:8000" # host:container
     # environment:
     #   - MONGO_URI=mongodb://mongodb:27017/
     volumes:
@@ -54,13 +54,13 @@ services:
 
   lcomhs:
     build:
-      context: ./LCOMHS
-      dockerfile: dockerfile
+      context: .
+      dockerfile: ./LCOMHS/dockerfile
     container_name: lcomhs_container
     # depends_on:
     #   - mongodb
     ports:
-      - "8002:8000"   # host:container
+      - "8002:8000" # host:container
     # environment:
     #   - MONGO_URI=mongodb://mongodb:27017/
     volumes:
@@ -76,20 +76,19 @@ services:
     depends_on:
       - mongodb
     ports:
-      - "8003:8000"   # host:container
+      - "8003:8000" # host:container
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
-
     # If you only want the gateway to call it internally, you can omit the port mapping.
     # But let's keep it to show direct access for debugging.
-  
+
   benchmark:
     build:
       context: ./Benchmark
       dockerfile: dockerfile
     container_name: benchmark_container
     ports:
-      - "8004:8000"   # host:container
+      - "8004:8000" # host:container
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
 
@@ -99,7 +98,7 @@ services:
       dockerfile: dockerfile
     container_name: instability_container
     ports:
-      - "8005:8000"   # host:container
+      - "8005:8000" # host:container
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
 
@@ -109,7 +108,7 @@ services:
       dockerfile: Dockerfile
     container_name: gateway_container
     ports:
-      - "8080:8080"  # host:gateway
+      - "8080:8080" # host:gateway
     environment:
       - LCOM4_SERVICE_URL=http://lcom4:8000
       - LCOMHS_SERVICE_URL=http://lcomhs:8000
