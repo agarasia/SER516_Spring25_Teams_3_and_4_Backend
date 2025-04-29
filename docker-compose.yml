@@ -9,25 +9,25 @@ services:
 
   afferent-api:
     build:
-      context: ./AfferentCoupling
+      context: .                            
+      dockerfile: AfferentCoupling/Dockerfile
     container_name: afferent-api-container
     ports:
       - "8081:8081"
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/afferent_db
-    depends_on:
-      - mongodb
+    volumes:
+      - shared-repos:/shared/repos
   
   efferent-api:
     build:
-      context: ./EfferentCoupling-API
+      context: .
+      dockerfile: EfferentCoupling-API/Dockerfile
+      args:
+        SERVICE_NAME: efferent
     container_name: efferent-api-container
     ports:
       - "8082:8082"
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/efferent_coupling_db
-    depends_on:
-      - mongodb
+    volumes:
+      - shared-repos:/shared/repos
   
   defectdensity-api:
     build:
@@ -35,23 +35,20 @@ services:
     container_name: defectdensityapi
     ports:
       - "8083:8083"
-    environment:
-      # Point URI at 'mongodb', because that's the service name
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/defectdensitydb
-    depends_on:
-      - mongodb
 
   lcom4:
     build:
       context: ./LCOM4
       dockerfile: dockerfile
     container_name: lcom4_container
-    depends_on:
-      - mongodb
+    # depends_on:
+    #   - mongodb
     ports:
       - "8001:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+    # environment:
+    #   - MONGO_URI=mongodb://mongodb:27017/
+    volumes:
+      - shared-repos:/shared/repos
     # If you only want the gateway to call it internally, you can omit the port mapping.
     # But let's keep it to show direct access for debugging.
 
@@ -60,12 +57,14 @@ services:
       context: ./LCOMHS
       dockerfile: dockerfile
     container_name: lcomhs_container
-    depends_on:
-      - mongodb
+    # depends_on:
+    #   - mongodb
     ports:
       - "8002:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+    # environment:
+    #   - MONGO_URI=mongodb://mongodb:27017/
+    volumes:
+      - shared-repos:/shared/repos
     # If you only want the gateway to call it internally, you can omit the port mapping.
     # But let's keep it to show direct access for debugging.
 
@@ -132,3 +131,4 @@ services:
 
 volumes:
   mongo_data:
+  shared-repos:

@@ -30,7 +30,7 @@ jobs:
         run: mvn test --file AfferentCoupling/pom.xml
 
       - name: Dockerize Afferent Coupling API
-        run: docker build -t afferent-api AfferentCoupling/
+        run: docker build -f AfferentCoupling/Dockerfile -t afferent-api .
 
       # Efferent Coupling API
       - name: Build Efferent Coupling API
@@ -40,7 +40,7 @@ jobs:
         run: mvn test --file EfferentCoupling-API/pom.xml
 
       - name: Dockerize Efferent Coupling API
-        run: docker build -t efferent-api EfferentCoupling-API/
+        run: docker build -f EfferentCoupling-API/Dockerfile -t efferent-coupling-api .
 
       # Defect Density API
       - name: Build Defect Density API

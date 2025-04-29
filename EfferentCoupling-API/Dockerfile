@@ -3,10 +3,11 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-COPY pom.xml .
+COPY EfferentCoupling-API/pom.xml .
 RUN mvn -q dependency:go-offline
 
-COPY src ./src
+COPY EfferentCoupling-API/src ./src
+COPY utilities ./src/main/java/utilities
 RUN mvn -q package -DskipTests         
 # → target/*.jar
 
