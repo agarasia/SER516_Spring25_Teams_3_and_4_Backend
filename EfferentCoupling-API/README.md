@@ -80,7 +80,7 @@ mvn clean package
 
 ### Building the Docker Container
 ```bash
-docker build --build-arg JAR_FILE=target/efferent-coupling-api-0.0.1-SNAPSHOT.jar -t efferent-coupling-api .
+docker build -f EfferentCoupling-API/Dockerfile -t efferent-coupling-api .
 ```
 
 ### Running the Docker Container
@@ -100,7 +100,7 @@ docker stop efferent-coupling-api
 ```
 
 ## testing curl command 
-curl -X POST http://localhost:8082/api/efferent-coupling/analyze \
+curl -X POST http://localhost:8082/efferent/analyze \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "url=https://github.com/shashirajraja/shopping-cart"
 

@@ -31,7 +31,7 @@ This guide provides instructions on how to run the Afferent Coupling API applica
 
 3. Enter the API Endpoint:
     ```bash
-    http://localhost:8081/api/coupling/github?repoUrl={GITHUB_URL}
+    http://localhost:8081/afferent/github?repoUrl={GITHUB_URL}
     ```
 4. Send the Request and verify response
 
@@ -46,7 +46,7 @@ mvn clean package
 
  ### Building the Docker Container
  ```bash
-  docker build -t afferent-api .
+  docker build -f AfferentCoupling/Dockerfile -t afferent-api .
  ```
  
  ### Running the Docker Container
@@ -64,9 +64,6 @@ docker rm afferent-api-container
 ```
 
 ## testing curl command 
-curl -X POST "http://localhost:8081/api/coupling/github?repoUrl={Github_URL}"
-
-## testing with private github repo url
-curl -X POST "http://localhost:8081/api/afferent-coupling/coupling/github?repoUrl={Github_URL}&token={Github_token}"
+curl -X POST "http://localhost:8081/afferent/github?repoUrl={Github_URL}"
 
 

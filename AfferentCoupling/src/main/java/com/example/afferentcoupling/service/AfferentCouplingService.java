@@ -3,6 +3,7 @@ package com.example.afferentcoupling.service;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
@@ -11,33 +12,28 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import utilities.RepoFetcher;
+
 @Service
 public class AfferentCouplingService {
     private static final String CLASS_PATTERN = "package\\s+([\\w\\.]+);.*?class\\s+(\\w+)";
     private static final String IMPORT_PATTERN = "import\\s+([\\w\\.]+);";
 
     public Map<String, Integer> processGitHubRepo(String repoUrl) {
-        return processGitHubRepo(repoUrl, null);
-    }
-
-    public Map<String, Integer> processGitHubRepo(String repoUrl, String token) {
-        File tempDir;
+        // return processGitHubRepo(repoUrl, null);
         try {
-            tempDir = Files.createTempDirectory("repo").toFile();
-            
-            CloneCommand cloneCommand = Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setDirectory(tempDir);
-            
-            // Authentication if token is provided
-            if (token != null && !token.isEmpty()) {
-                cloneCommand.setCredentialsProvider(
-                    new UsernamePasswordCredentialsProvider(token, "")
-                );
+            // Use RepoFetcher to check if repo already exists
+            RepoFetcher.FetchResult fetchResult = RepoFetcher.fetchRepo(repoUrl);
+
+            if (fetchResult.error != null) {
+                Map<String, Integer> body = Collections.singletonMap(fetchResult.error, 404);
+                return body;
             }
-            cloneCommand.call();
+
+            File repoDirectory = new File(fetchResult.repoDir);
+
             List<String> javaFiles = new ArrayList<>();
-            Files.walk(tempDir.toPath())
+            Files.walk(repoDirectory.toPath())
                     .filter(path -> path.toString().endsWith(".java"))
                     .forEach(path -> {
                         try {
@@ -52,7 +48,7 @@ public class AfferentCouplingService {
             throw new RuntimeException("Error processing GitHub repo: " + e.getMessage());
         }
     }
-
+    
     private Map<String, Integer> computeCoupling(List<String> javaFiles) {
         Map<String, Set<String>> classDependencies = new HashMap<>();
         Map<String, Set<String>> afferentCoupling = new HashMap<>();
