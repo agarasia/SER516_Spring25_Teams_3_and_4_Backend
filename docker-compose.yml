@@ -38,8 +38,8 @@ services:
 
   lcom4:
     build:
-      context: ./LCOM4
-      dockerfile: dockerfile
+      context: .
+      dockerfile: ./LCOM4/dockerfile
     container_name: lcom4_container
     # depends_on:
     #   - mongodb

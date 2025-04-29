@@ -10,7 +10,7 @@ import time
 
 router = APIRouter()
 
-@router.post("/calculate")
+@router.post("/")
 async def calculate_lcomhs_endpoint(
     gitHubLink: Optional[str] = Form(
         None, description="GitHub URL"
