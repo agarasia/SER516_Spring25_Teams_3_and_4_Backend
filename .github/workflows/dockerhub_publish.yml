@@ -33,7 +33,7 @@ jobs:
           docker build -t app-lcomhs LCOMHS -f LCOMHS/dockerfile
           docker build -t app-lcom4 LCOM4 -f LCOM4/dockerfile
           docker build -t app-defect-density DefectDensity-API -f DefectDensity-API/Dockerfile
-          docker build -t app-afferent-coupling AfferentCoupling -f AfferentCoupling/Dockerfile
+          docker build -t app-afferent-coupling -f AfferentCoupling/Dockerfile .
           # docker build -t app-efferent-coupling EfferentCoupling-API -f EfferentCoupling-API/Dockerfile
 
       - name: Log in to Docker Hub
