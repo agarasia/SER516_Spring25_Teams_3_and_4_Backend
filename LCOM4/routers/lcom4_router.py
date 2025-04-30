@@ -1,4 +1,4 @@
-from services.shared_volume_service import fetch_repo
+from services.shared_volume_service import fetch_repo 
 # ,clone_repo
 
 from fastapi import APIRouter, HTTPException, Form
@@ -11,7 +11,7 @@ import time
 
 router = APIRouter()
 
-@router.post("/calculate")
+@router.post("/lcom4")
 async def calculate_lcom4_endpoint(
     gitHubLink: Optional[str] = Form(
         None, description="GitHub URL if sourceType='git'. Ignored otherwise."
@@ -35,7 +35,8 @@ async def calculate_lcom4_endpoint(
         if not gitHubLink:
             raise HTTPException(status_code=400, detail="Please provide a GitHub URL in gitHubLink.")
 
-        # headsh1, dir_path = clone_repo(gitHubLink)  /un comment this line and clone_repo for testing
+        # headsh1, dir_path = clone_repo(gitHubLink)  
+        # /un comment this line and clone_repo for testing
 
         # fetch the GitHub repo from shared volume
         headsh, temp_dir = fetch_repo(gitHubLink)

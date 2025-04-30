@@ -1,12 +1,4 @@
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
   afferent-api:
     build:
       context: ./AfferentCoupling
@@ -15,9 +7,7 @@ services:
       - "8081:8081"
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/afferent_db
-    depends_on:
-      - mongodb
-  
+
   efferent-api:
     build:
       context: ./EfferentCoupling-API
@@ -26,8 +16,7 @@ services:
       - "8082:8082"
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/efferent_coupling_db
-    depends_on:
-      - mongodb
+
   
   defectdensity-api:
     build:
@@ -41,10 +30,9 @@ services:
       context: ./LCOM4
       dockerfile: dockerfile
     container_name: lcom4_container
-    # depends_on:
-    #   - mongodb
+
     ports:
-      - "8001:8000"   # host:container
+      - "5000:5000"   # host:container
     # environment:
     #   - MONGO_URI=mongodb://mongodb:27017/
     volumes:
@@ -57,26 +45,21 @@ services:
       context: ./LCOMHS
       dockerfile: dockerfile
     container_name: lcomhs_container
-    depends_on:
-      - mongodb
+
     ports:
       - "8002:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
-    # If you only want the gateway to call it internally, you can omit the port mapping.
-    # But let's keep it to show direct access for debugging.
+
+
 
   defectscore:
     build:
       context: ./DefectScore
       dockerfile: dockerfile
     container_name: defect_score_container
-    depends_on:
-      - mongodb
+
     ports:
       - "8003:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+
 
     # If you only want the gateway to call it internally, you can omit the port mapping.
     # But let's keep it to show direct access for debugging.
@@ -88,8 +71,6 @@ services:
     container_name: benchmark_container
     ports:
       - "8004:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
 
   instability:
     build:
@@ -98,8 +79,6 @@ services:
     container_name: instability_container
     ports:
       - "8005:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
 
   gateway:
     build:
@@ -128,5 +107,4 @@ services:
       - defectdensity-api
 
 volumes:
-  mongo_data:
   shared-repos:
