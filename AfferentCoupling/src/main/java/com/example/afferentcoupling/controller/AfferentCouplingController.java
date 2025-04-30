@@ -1,5 +1,6 @@
 package com.example.afferentcoupling.controller;
 
+import com.example.afferentcoupling.dto.RepoRequest;
 import com.example.afferentcoupling.service.AfferentCouplingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +20,23 @@ public class AfferentCouplingController {
     @Autowired
     private AfferentCouplingService service;
 
-    @PostMapping("/github")
-    public ResponseEntity<Map<String, Object>> computeFromGitHub(
-            @RequestParam String repoUrl,
-            @RequestParam(required = false) String token) {
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> computeFromGitHub(@RequestBody RepoRequest request) {
 
         String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
         try {
-            Map<String, Integer> couplingResult = service.processGitHubRepo(repoUrl);
+            Map<String, Integer> couplingResult = service.processGitHubRepo(request.getRepoUrl());
 
-            // Build successful response
+            // If the repo wasn't cloned or the result is null/empty, return a clean error
+            if (couplingResult.size() == 1 && couplingResult.containsKey("Clone the repo first.") && couplingResult.get("Clone the repo first.") == 404) {
+                Map<String, Object> errorResponse = new LinkedHashMap<>();
+                errorResponse.put("error", "Clone the repo first.");
+                return ResponseEntity.ok(errorResponse);
+            }
+            
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("timestamp", timestamp);
-            
+
             List<Map<String, Object>> dataList = couplingResult.entrySet().stream()
                     .map(e -> {
                         Map<String, Object> m = new LinkedHashMap<>();
@@ -45,10 +50,8 @@ public class AfferentCouplingController {
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException ex) {
-            // RepoFetcher.fetchRepo() returned an error → return 200 with message
             Map<String, Object> errorResponse = new LinkedHashMap<>();
-            errorResponse.put("timestamp", timestamp);
-            errorResponse.put("message", ex.getMessage());
+            errorResponse.put("error", ex.getMessage());
             return ResponseEntity.ok(errorResponse);
         }
     }
