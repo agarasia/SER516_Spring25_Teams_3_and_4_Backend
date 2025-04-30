@@ -20,7 +20,7 @@ public class GitHubDefectControllerTest {
     
     @Test
     public void testGetDefectRepoCountInvalidUrl() throws Exception {
-        mockMvc.perform(get("/api/defects/repo")
+        mockMvc.perform(get("/defectdensity")
                 .param("url", "https://notgithub.com/owner/repo")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -28,7 +28,7 @@ public class GitHubDefectControllerTest {
     }
     @Test
     public void testMockLocApi() throws Exception {
-        mockMvc.perform(get("/api/defects/loc-mock")
+        mockMvc.perform(get("/defectdensity/loc-mock")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalLinesOfCode").exists());
