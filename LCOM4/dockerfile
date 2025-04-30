@@ -2,7 +2,7 @@ FROM python:3.12.8-slim
 
 WORKDIR /app
 
-COPY LCOM4/. /app/LCOM4
+COPY LCOM4/ /app/
 COPY utilities/ /app/utilities/
 
 WORKDIR /app/LCOM4
