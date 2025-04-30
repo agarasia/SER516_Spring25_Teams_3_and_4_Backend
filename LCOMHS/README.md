@@ -26,4 +26,6 @@ docker rm locmhs-api-container
 ```
 
 ### testing using curl commands 
-curl -X POST "http://localhost:8000/api/lcomhs/calculate" -F "gitHubLink=https://github.com/HouariZegai/Calculator"
+curl -X POST "http://localhost:8000/api/lcomhs/calculate" \
+     -H "Content-Type: application/json" \
+     -d '{"repo_url": "https://github.com/HouariZegai/Calculator"}'
