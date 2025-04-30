@@ -1,6 +1,7 @@
 package com.defectdensityapi.Controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -17,15 +18,18 @@ public class GitHubDefectControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    
+
     @Test
     public void testGetDefectRepoCountInvalidUrl() throws Exception {
-        mockMvc.perform(get("/defectdensity")
-                .param("url", "https://notgithub.com/owner/repo")
-                .contentType(MediaType.APPLICATION_JSON))
+        String invalidPayload = "{ \"repo_url\": \"https://notgithub.com/owner/repo\" }";
+
+        mockMvc.perform(post("/defectdensity")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidPayload))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Provided URL is not a valid GitHub repository."));
     }
+
     @Test
     public void testMockLocApi() throws Exception {
         mockMvc.perform(get("/defectdensity/loc-mock")
