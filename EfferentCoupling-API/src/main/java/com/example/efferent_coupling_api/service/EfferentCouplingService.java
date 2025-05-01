@@ -1,5 +1,5 @@
 package com.example.efferent_coupling_api.service;
-import utilities.RepoFetcher;
+import com.example.efferent_coupling_api.utilities.RepoFetcher;
 
 import com.example.efferent_coupling_api.util.JavaParserUtil;
 import com.example.efferent_coupling_api.util.FetchRepoPythonCaller;
