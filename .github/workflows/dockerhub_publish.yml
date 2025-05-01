@@ -28,7 +28,6 @@ jobs:
 
       - name: Build Docker Images
         run: |
-          docker build -t app-instability -f Instability/dockerfile .
           docker build -t app-defect-score -f DefectScore/dockerfile .
           docker build -t app-lcomhs -f LCOMHS/dockerfile .
           docker build -t app-lcom4 -f LCOM4/dockerfile .
