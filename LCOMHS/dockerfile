@@ -4,7 +4,7 @@ FROM python:3.12.8-slim
 WORKDIR /app
 
 # Copy the LCOMHS application source code
-COPY . /app/LCOMHS
+COPY LCOMHS/ /app/LCOMHS/
 
 # Copy shared utilities folder from parent
 COPY utilities/ /app/utilities/
