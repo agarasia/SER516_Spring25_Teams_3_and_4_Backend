@@ -1,5 +1,8 @@
-from fastapi import APIRouter, HTTPException, Request
 from datetime import datetime
+# ,clone_repo
+
+from fastapi import APIRouter, HTTPException, Form
+from typing import Optional
 
 from utilities.fetch_repo import fetch_repo 
 from services.lcom4_calculator import calculate_lcom4
@@ -7,8 +10,10 @@ from services.project_parser import parse_java_files_in_dir
 
 router = APIRouter()
 
-@router.post("/")
-async def calculate_lcom4_endpoint(request: Request):
+@router.post("/lcom4")
+async def calculate_lcom4_endpoint(
+  request:dict
+):
     """
     Endpoint to compute LCOM4 from a GitHub URL.
 
@@ -27,6 +32,8 @@ async def calculate_lcom4_endpoint(request: Request):
         if not gitHubLink:
             raise HTTPException(status_code=400, detail="Please provide a GitHub URL in 'repo_url'.")
 
+        # headsh1, dir_path = clone_repo(gitHubLink)  
+        # /un comment this line and clone_repo for testing
         # Fetch repo from shared volume
         fetch_result = fetch_repo(gitHubLink)
 

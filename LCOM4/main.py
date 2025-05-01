@@ -8,7 +8,7 @@ app = FastAPI(
 )
 
 # Include the LCOM4 router
-app.include_router(lcom4_router, prefix="/lcom4", tags=["LCOM4"])
+app.include_router(lcom4_router, tags=["LCOM4"])
 
 # Optionally, you could add root endpoint or health check
 @app.get("/")

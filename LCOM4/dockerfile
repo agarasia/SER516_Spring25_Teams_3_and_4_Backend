@@ -4,7 +4,7 @@ FROM python:3.12.8-slim
 WORKDIR /app
 
 # Copy LCOM4 source code
-COPY LCOM4/ /app/LCOM4
+COPY . /app/LCOM4
 
 # Copy shared utilities folder
 COPY utilities/ /app/utilities/
@@ -22,8 +22,5 @@ ENV PYTHONPATH="/app"
 # Set working directory to where your main.py lives
 WORKDIR /app/LCOM4
 
-# Expose FastAPI port
-EXPOSE 8000
-
-# Run the FastAPI app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 5000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5001"]
