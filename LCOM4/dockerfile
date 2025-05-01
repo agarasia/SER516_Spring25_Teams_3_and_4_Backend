@@ -4,7 +4,7 @@ FROM python:3.12.8-slim
 WORKDIR /app
 
 # Copy LCOM4 source code
-COPY LCOM4/ /app/LCOM4/
+COPY . /app/LCOM4/
 
 # Copy shared utilities folder
 COPY utilities/ /app/utilities/
