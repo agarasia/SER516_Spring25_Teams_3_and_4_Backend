@@ -28,10 +28,11 @@ jobs:
 
       - name: Build Docker Images
         run: |
-          docker build -t app-defect-score -f DefectScore/dockerfile .
-          docker build -t app-lcomhs -f LCOMHS/dockerfile .
-          docker build -t app-lcom4 -f LCOM4/dockerfile .
-          docker build -t app-defect-density -f DefectDensity-API/Dockerfile .
+          docker build -t app-instability Instability -f Instability/dockerfile
+          docker build -t app-defect-score DefectScore -f DefectScore/dockerfile
+          docker build -t app-lcomhs LCOMHS -f LCOMHS/dockerfile
+          docker build -t app-lcom4 LCOM4 -f LCOM4/dockerfile
+          docker build -t app-defect-density DefectDensity-API -f DefectDensity-API/Dockerfile
           docker build -t app-afferent-coupling -f AfferentCoupling/Dockerfile .
           docker build -t app-efferent-coupling -f EfferentCoupling-API/Dockerfile .
 
