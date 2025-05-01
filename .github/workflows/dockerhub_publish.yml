@@ -44,15 +44,22 @@ jobs:
       - name: Log in to Docker Hub
         run: |
           echo "${{ env.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+      
+      - name: Determine VERSION
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "VERSION=${{ github.event.inputs.release_version }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+          else
+            echo "VERSION=latest" >> $GITHUB_ENV
+          fi
 
       - name: Tag and Push Images
         run: |
-          # Choose version: on manual dispatch use input, otherwise 'latest'
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.release_version }}"
-          else
-            VERSION="latest"
-          fi
           echo "Using version: $VERSION"
 
           # Instability
