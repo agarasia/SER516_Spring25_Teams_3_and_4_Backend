@@ -8,7 +8,7 @@ app = FastAPI(
 )
 
 # Include the LCOMHS router
-app.include_router(lcomhs_router, prefix="/lcomhs", tags=["LCOMHS"])
+app.include_router(lcomhs_router, tags=["LCOMHS"])
 
 # Optionally, you could add root endpoint or health check
 @app.get("/")

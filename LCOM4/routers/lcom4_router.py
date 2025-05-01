@@ -1,7 +1,7 @@
 from datetime import datetime
 # ,clone_repo
 
-from fastapi import APIRouter, HTTPException, Form
+from fastapi import APIRouter, HTTPException, Request
 from typing import Optional
 
 from utilities.fetch_repo import fetch_repo 
@@ -11,9 +11,7 @@ from services.project_parser import parse_java_files_in_dir
 router = APIRouter()
 
 @router.post("/lcom4")
-async def calculate_lcom4_endpoint(
-  request:dict
-):
+async def calculate_lcom4_endpoint(request: Request):
     """
     Endpoint to compute LCOM4 from a GitHub URL.
 

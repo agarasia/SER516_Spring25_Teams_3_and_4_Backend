@@ -7,7 +7,7 @@ from services.project_parser import parse_java_files_in_dir
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("/lcomhs")
 async def calculate_lcomhs_endpoint(request: Request):
     """
     Endpoint to compute LCOMHS from a GitHub URL.
