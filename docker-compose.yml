@@ -51,7 +51,7 @@ services:
     container_name: lcomhs_container
 
     ports:
-      - "8002:8000"   # host:container
+      - "5000:5000"   # host:container
 
 
 

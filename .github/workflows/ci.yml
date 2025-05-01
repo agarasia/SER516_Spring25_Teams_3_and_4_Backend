@@ -87,7 +87,7 @@ jobs:
         run:  PYTHONPATH=LCOM4 pytest LCOM4/tests
 
       - name: Dockerize LCOM4
-        run: docker build -t lcom4 -f LCOM4/Dockerfile .
+        run: docker build -t lcom4 LCOM4/
 
       # LCOMHS
       - name: Install LCOMHS dependencies
@@ -97,7 +97,7 @@ jobs:
         run: PYTHONPATH=LCOMHS pytest LCOMHS/tests
 
       - name: Dockerize LCOMHS
-        run: docker build -t lcomhs -f LCOMHS/Dockerfile .
+        run: docker build -t lcomhs LCOMHS/
 
       # Middleware
       - name: Install Middleware dependencies
