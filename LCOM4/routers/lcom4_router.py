@@ -1,3 +1,4 @@
+from datetime import datetime
 from services.shared_volume_service import fetch_repo 
 # ,clone_repo
 
@@ -12,9 +13,7 @@ router = APIRouter()
 
 @router.post("/lcom4")
 async def calculate_lcom4_endpoint(
-    gitHubLink: Optional[str] = Form(
-        None, description="GitHub URL if sourceType='git'. Ignored otherwise."
-    )
+  request:dict
 ):
     """
     Endpoint to compute LCOM4 from a GitHub URL.
