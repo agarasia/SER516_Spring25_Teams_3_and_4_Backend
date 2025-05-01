@@ -12,9 +12,6 @@ This guide provides instructions on how to run the Afferent Coupling API applica
 2. **Run the Application:**
 
    ```bash
-   brew services start mongodb-community@6.0
-   ```
-   ```bash
    mvn spring-boot:run
    ```
 
@@ -28,15 +25,46 @@ This guide provides instructions on how to run the Afferent Coupling API applica
 
 ## Testing the API using Postman
 
-1. Open Postman
 
-2. Select **POST** request
+## 🧪 How to Test the Afferent API using Postman
 
-3. Enter the API Endpoint:
-    ```bash
-    http://localhost:8081/api/coupling/github?repoUrl={GITHUB_URL}
-    ```
-4. Send the Request and verify response
+Follow these steps to send a `POST` request to the API endpoint using [Postman](https://www.postman.com/):
+
+### 🔧 Steps
+
+1. **Open Postman**.
+
+2. **Set the HTTP method to `POST`** using the dropdown on the left of the URL bar.
+
+3. **Enter the API Endpoint**:
+   ```
+   http://localhost:8001/afferent
+   ```
+
+4. **Set the Request Body**:
+   - Navigate to the **Body** tab.
+   - Select **raw**.
+   - From the dropdown next to “Text”, choose **JSON**.
+   - Paste the following JSON into the editor:
+     ```json
+     {
+       "repo_url": "{Github_URL}"
+     }
+     ```
+
+5. **(Optional) Set Headers**:
+   - Go to the **Headers** tab.
+   - Ensure the following header is present (usually auto-added):
+     ```
+     Key: Content-Type
+     Value: application/json
+     ```
+
+6. **Click "Send"** to submit the request.
+
+7. **Check the Response**:
+   - A JSON response will return with the calculated metrics or an error message.
+
 
 
 ## Building and Running with Docker
@@ -47,22 +75,16 @@ Ensure that the `.jar` file exists before building the Docker container. Use the
 mvn clean package
 ```
 
-### Building the Docker Container
-```bash
- docker build -t afferent-api .
-```
+ ### Building the Docker Container
+ ```bash
+  docker build -f AfferentCoupling/Dockerfile -t afferent-api .
+ ```
+ 
+ ### Running the Docker Container
+ ```bash
+ docker run -p 8081:8081 --name afferent-api-container afferent-api
+ ```
 
-### Running the Docker Container
-```bash
-docker run -d --name mongodb -p 27017:27017 mongo
-```
-```bash
-docker run --name afferent-api-container \
-  -p 8081:8081 \
-  -e SPRING_DATA_MONGODB_URI=mongodb://host.docker.internal:27017/afferent_db \
-  afferent-api
-
-```
 ### Stopping the Container
 ```bash
 docker stop afferent-api-container
@@ -73,9 +95,8 @@ docker rm afferent-api-container
 ```
 
 ## testing curl command 
-curl -X POST "http://localhost:8081/api/coupling/github?repoUrl={Github_URL}"
-
-## testing with private github repo url
-curl -X POST "http://localhost:8081/api/afferent-coupling/coupling/github?repoUrl={Github_URL}&token={Github_token}"
+curl -X POST http://localhost:8001/afferent \
+     -H "Content-Type: application/json" \
+     -d '{"repo_url":{Github_URL}"}'
 
 

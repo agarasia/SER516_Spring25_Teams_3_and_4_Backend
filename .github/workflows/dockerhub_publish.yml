@@ -1,0 +1,94 @@
+name: Publish Metrics Services to Docker Hub
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release Version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker Images
+        run: |
+          docker build -t app-instability Instability -f Instability/dockerfile
+          docker build -t app-defect-score DefectScore -f DefectScore/dockerfile
+          docker build -t app-lcomhs LCOMHS -f LCOMHS/dockerfile
+          docker build -t app-lcom4 LCOM4 -f LCOM4/dockerfile
+          docker build -t app-defect-density DefectDensity-API -f DefectDensity-API/Dockerfile
+          docker build -t app-afferent-coupling -f AfferentCoupling/Dockerfile .
+          docker build -t app-efferent-coupling -f EfferentCoupling-API/Dockerfile .
+
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ env.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Tag and Push Images
+        run: |
+          # Choose version: on manual dispatch use input, otherwise 'latest'
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.release_version }}"
+          else
+            VERSION="latest"
+          fi
+          echo "Using version: $VERSION"
+
+          # Instability
+          docker tag app-instability ${{ env.DOCKERHUB_USERNAME }}/app-instability:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-instability:latest
+          docker tag app-instability ${{ env.DOCKERHUB_USERNAME }}/app-instability:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-instability:$VERSION
+
+          # Defect Score
+          docker tag app-defect-score ${{ env.DOCKERHUB_USERNAME }}/app-defect-score:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-defect-score:latest
+          docker tag app-defect-score ${{ env.DOCKERHUB_USERNAME }}/app-defect-score:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-defect-score:$VERSION
+
+          # LCOMHS
+          docker tag app-lcomhs ${{ env.DOCKERHUB_USERNAME }}/app-lcomhs:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-lcomhs:latest
+          docker tag app-lcomhs ${{ env.DOCKERHUB_USERNAME }}/app-lcomhs:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-lcomhs:$VERSION
+
+          # LCOM4
+          docker tag app-lcom4 ${{ env.DOCKERHUB_USERNAME }}/app-lcom4:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-lcom4:latest
+          docker tag app-lcom4 ${{ env.DOCKERHUB_USERNAME }}/app-lcom4:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-lcom4:$VERSION
+
+          # Defect Density
+          docker tag app-defect-density ${{ env.DOCKERHUB_USERNAME }}/app-defect-density:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-defect-density:latest
+          docker tag app-defect-density ${{ env.DOCKERHUB_USERNAME }}/app-defect-density:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-defect-density:$VERSION
+
+          # Afferent Coupling
+          docker tag app-afferent-coupling ${{ env.DOCKERHUB_USERNAME }}/app-afferent-coupling:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-afferent-coupling:latest
+          docker tag app-afferent-coupling ${{ env.DOCKERHUB_USERNAME }}/app-afferent-coupling:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-afferent-coupling:$VERSION
+
+          # Efferent Coupling
+          docker tag app-efferent-coupling ${{ env.DOCKERHUB_USERNAME }}/app-efferent-coupling:latest
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-efferent-coupling:latest
+          docker tag app-efferent-coupling ${{ env.DOCKERHUB_USERNAME }}/app-efferent-coupling:$VERSION
+          docker push ${{ env.DOCKERHUB_USERNAME }}/app-efferent-coupling:$VERSION

@@ -12,7 +12,7 @@ app = FastAPI(
 
 @app.get("/")
 def read_root():
-    return {"message": "LCOM4 Microservice is running."}
+    return {"message": "Benchmark Microservice is running."}
 
 @app.post("/benchmark")
 def store_benchmark_for_project(

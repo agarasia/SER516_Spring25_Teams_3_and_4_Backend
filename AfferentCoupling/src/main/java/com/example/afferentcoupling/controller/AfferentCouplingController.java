@@ -1,73 +1,58 @@
 package com.example.afferentcoupling.controller;
 
-import com.example.afferentcoupling.model.AfferentCouplingData;
-import com.example.afferentcoupling.model.CouplingData;
-import com.example.afferentcoupling.model.CouplingRequest;
-import com.example.afferentcoupling.model.ResponseObject;
+import com.example.afferentcoupling.dto.RepoRequest;
 import com.example.afferentcoupling.service.AfferentCouplingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.HashMap;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/afferent")
 public class AfferentCouplingController {
 
     @Autowired
     private AfferentCouplingService service;
 
-    @GetMapping("/coupling")
-    public ResponseEntity<List<AfferentCouplingData>> getCoupling(@RequestParam String repoUrl) {
-        List<AfferentCouplingData> data = service.getCouplingData(repoUrl);
-        if (data == null)
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(data);
-    }
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> computeFromGitHub(@RequestBody RepoRequest request) {
 
-    @PostMapping("/coupling")
-    public ResponseEntity<String> postCoupling(@RequestBody CouplingRequest req) {
-        service.saveCouplingData(req.getRepoUrl(), req.getCouplingData());
-        return ResponseEntity.ok("Saved successfully");
-    }
+        String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
+        try {
+            Map<String, Integer> couplingResult = service.processGitHubRepo(request.getRepoUrl());
 
-    @PostMapping("/coupling/github")
-    public ResponseEntity<ResponseObject> computeFromGitHub(@RequestParam String repoUrl,
-            @RequestParam(required = false) String token) {
-        Map<String, Integer> result = service.processGitHubRepo(repoUrl, token);
-        if (result == null || result.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            // If the repo wasn't cloned or the result is null/empty, return a clean error
+            if (couplingResult.size() == 1 && couplingResult.containsKey("Clone the repo first.") && couplingResult.get("Clone the repo first.") == 404) {
+                Map<String, Object> errorResponse = new LinkedHashMap<>();
+                errorResponse.put("error", "Clone the repo first.");
+                return ResponseEntity.ok(errorResponse);
+            }
+            
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("timestamp", timestamp);
+
+            List<Map<String, Object>> dataList = couplingResult.entrySet().stream()
+                    .map(e -> {
+                        Map<String, Object> m = new LinkedHashMap<>();
+                        m.put("class_name", e.getKey());
+                        m.put("score", e.getValue());
+                        return m;
+                    })
+                    .collect(Collectors.toList());
+
+            response.put("data", dataList);
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException ex) {
+            Map<String, Object> errorResponse = new LinkedHashMap<>();
+            errorResponse.put("error", ex.getMessage());
+            return ResponseEntity.ok(errorResponse);
         }
-        List<CouplingData> couplingData = result.entrySet().stream()
-                .map(entry -> new CouplingData(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-
-
-        AfferentCouplingData currComputedResult = new AfferentCouplingData();
-        currComputedResult.setRepoUrl(repoUrl);
-        currComputedResult.setCouplingData(couplingData);
-        currComputedResult.setTimestamp(Instant.now().toString());
-
-        ResponseObject responseObject = new ResponseObject(service.getCouplingData(repoUrl), currComputedResult);
-        // Save the coupling data to the database
-        service.saveCouplingData(repoUrl, result);
-        return ResponseEntity.ok(responseObject);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "Bad Request");
-        response.put("message", ex.getMessage());
-        response.put("timestamp", Instant.now().toString());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

@@ -2,7 +2,7 @@
 
 This guide provides instructions on how to run the Efferent Coupling API application both locally and using Docker.
 
----
+<!-- ---
 
 ## 🛠️ MongoDB Setup Using Docker
 
@@ -24,7 +24,7 @@ This will:
 - Name the container `mongo-container`
 - Set the default database to `efferent_coupling_db`
 
-> By default, the Spring Boot app connects to `mongodb://localhost:27017/efferent_coupling_db`. No extra config needed unless overridden.
+> By default, the Spring Boot app connects to `mongodb://localhost:27017/efferent_coupling_db`. No extra config needed unless overridden. -->
 
 ---
 
@@ -48,27 +48,45 @@ This will:
    - **Variable Name:** `url`
    - **Expected Input Value:** GitHub repository URL.
 
-## Testing the API using Postman
 
-1. Open Postman
+## 🧪 How to Test the Efferent API using Postman
 
-2. Select **POST** request
+Follow these steps to send a `POST` request to the API endpoint using [Postman](https://www.postman.com/):
 
-3. Enter the API Endpoint:
-    ```bash
-    http://localhost:8082/api/efferent-coupling/analyze
-    ```
+### 🔧 Steps
 
-4. Go to the **"Body"** tab in Postman,Select **"form-data"**
+1. **Open Postman**.
 
-5. Add a new key with:
-    - **Key**: `url`
-    - **Type**: `Text`
-    - **Value**: GitHub repository URL containing Java Code.
+2. **Set the HTTP method to `POST`** using the dropdown on the left of the URL bar.
 
-6. Ensure the Content-Type is set to `multipart/form-data`
+3. **Enter the API Endpoint**:
+   ```
+   http://localhost:8002/efferent
+   ```
 
-7. Send the Request and verify response
+4. **Set the Request Body**:
+   - Navigate to the **Body** tab.
+   - Select **raw**.
+   - From the dropdown next to “Text”, choose **JSON**.
+   - Paste the following JSON into the editor:
+     ```json
+     {
+       "repo_url": "{Github_URL}"
+     }
+     ```
+
+5. **(Optional) Set Headers**:
+   - Go to the **Headers** tab.
+   - Ensure the following header is present (usually auto-added):
+     ```
+     Key: Content-Type
+     Value: application/json
+     ```
+
+6. **Click "Send"** to submit the request.
+
+7. **Check the Response**:
+   - A JSON response will return with the calculated metrics or an error message.
 
 ## Building and Running with Docker
 
@@ -80,20 +98,18 @@ mvn clean package
 
 ### Building the Docker Container
 ```bash
-docker build --build-arg JAR_FILE=target/efferent-coupling-api-0.0.1-SNAPSHOT.jar -t efferent-coupling-api .
+docker build -f EfferentCoupling-API/Dockerfile -t efferent-coupling-api .
 ```
 
-### Running the Docker Container (Connected to MongoDB)
+### Running the Docker Container
 
 ```bash
 docker run -d -p 8082:8082 --name efferent-coupling-api \
-  --link mongo-container \
-  -e MONGO_URI=mongodb://mongo-container:27017/efferent_coupling_db \
   efferent-coupling-api
 ```
-
+<!-- 
 > The `--link` connects your app container with the MongoDB container using an internal hostname (`mongo-container`).
-> The database name is set as `efferent_coupling_db`.
+> The database name is set as `efferent_coupling_db`. -->
 
 
 ### Stopping the Container
@@ -102,8 +118,8 @@ docker stop efferent-coupling-api
 ```
 
 ## testing curl command 
-curl -X POST http://localhost:8082/api/efferent-coupling/analyze \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "url=https://github.com/shashirajraja/shopping-cart"
+curl -X POST http://localhost:8002/efferent \
+     -H "Content-Type: application/json" \
+     -d '{"repo_url":{Github_URL}"}'
 
 

@@ -9,7 +9,7 @@ import time
 app = FastAPI(title="API Gateway (Middleware)")
 
 # We'll read service URLs from ENV or default
-LCOM4_URL = os.environ.get("LCOM4_SERVICE_URL", "http://lcom4:8000")
+LCOM4_URL = os.environ.get("LCOM4_SERVICE_URL", "http://lcom4:5001")
 LCOMHS_URL = os.environ.get("LCOMHS_URL", "http://lcomhs:8000")
 DEFECT_SCORE_URL = os.environ.get("DEFECT_SCORE_URL", "http://defectscore:8000")
 BENCHMARK_URL = os.environ.get("BENCHMARK_SERVICE_URL", "http://benchmark:8000")
