@@ -30,7 +30,7 @@ jobs:
         run: mvn test --file AfferentCoupling/pom.xml
 
       - name: Dockerize Afferent Coupling API
-        run: docker build -t afferent-api AfferentCoupling/
+        run: docker build -f AfferentCoupling/Dockerfile -t afferent-api .
 
       # Efferent Coupling API
       - name: Build Efferent Coupling API
@@ -40,7 +40,7 @@ jobs:
         run: mvn test --file EfferentCoupling-API/pom.xml
 
       - name: Dockerize Efferent Coupling API
-        run: docker build -t efferent-api EfferentCoupling-API/
+        run: docker build -f EfferentCoupling-API/Dockerfile -t efferent-coupling-api .
 
       # Defect Density API
       - name: Build Defect Density API
@@ -87,7 +87,7 @@ jobs:
         run:  PYTHONPATH=LCOM4 pytest LCOM4/tests
 
       - name: Dockerize LCOM4
-        run: docker build -t lcom4 LCOM4/
+        run: docker build -t lcom4 -f LCOM4/Dockerfile .
 
       # LCOMHS
       - name: Install LCOMHS dependencies
@@ -97,7 +97,7 @@ jobs:
         run: PYTHONPATH=LCOMHS pytest LCOMHS/tests
 
       - name: Dockerize LCOMHS
-        run: docker build -t lcomhs LCOMHS/
+        run: docker build -t lcomhs -f LCOMHS/Dockerfile .
 
       # Middleware
       - name: Install Middleware dependencies

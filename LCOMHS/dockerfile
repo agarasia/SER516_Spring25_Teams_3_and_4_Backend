@@ -1,14 +1,28 @@
 FROM python:3.12.8-slim
 
+# Set base working directory
 WORKDIR /app
 
-# Now we can copy from the entire repo structure
-COPY . /app/LCOMHS
-# etc., if you want more
+# Copy the LCOMHS application source code
+COPY LCOMHS/ /app/LCOMHS
 
+# Copy shared utilities folder from parent
+COPY utilities/ /app/utilities/
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y git && apt-get clean
+
+# Install Python dependencies (assumes requirements.txt is in LCOMHS/)
+RUN pip install --no-cache-dir -r /app/LCOMHS/requirements.txt
+
+# Make utilities accessible to LCOMHS using PYTHONPATH
+ENV PYTHONPATH="/app"
+
+# Set the working directory to the app's root
 WORKDIR /app/LCOMHS
-RUN apt-get update && apt-get install -y git
-RUN pip install --no-cache-dir -r requirements.txt
 
+# Expose FastAPI port
 EXPOSE 8000
+
+# Run the FastAPI server
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

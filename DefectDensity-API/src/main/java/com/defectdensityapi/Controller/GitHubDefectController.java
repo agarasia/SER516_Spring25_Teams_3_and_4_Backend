@@ -1,26 +1,22 @@
 package com.defectdensityapi.Controller;
 
+import com.defectdensityapi.util.GithubLinkOwnerRepoExtractor;
+import com.defectdensityapi.util.LocApiAdapter;
+import com.defectdensityapi.dto.RepoRequest;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import org.springframework.web.client.RestTemplate;
-
-import com.defectdensityapi.util.GithubLinkOwnerRepoExtractor;
-import com.defectdensityapi.util.LocApiAdapter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/defects")
+@RequestMapping("/defectdensity")
 public class GitHubDefectController {
 
     private final RestTemplate restTemplate;
@@ -33,22 +29,21 @@ public class GitHubDefectController {
         this.locApiAdapter = locApiAdapter;
     }
 
-    @GetMapping("/repo")
-    public ResponseEntity<Map<String, Object>> getDefectRepoCount(
-            @RequestParam(value = "url") String url1) throws Exception {
-
+    @PostMapping()
+    public ResponseEntity<Map<String, Object>> getDefectRepoCount(@RequestBody RepoRequest request) throws Exception {
         Map<String, Object> responseMap = new HashMap<>();
+        String url1 = request.getRepoUrl();
+
         try {
-            // Extract "owner/repo" from the GitHub URL
-            String repoUrl = GithubLinkOwnerRepoExtractor.extractOwnerRepo(url1);
-            if (repoUrl == null) {
-                responseMap.put("error", "Invalid GitHub repository URL format.");
+            if (url1 == null || !url1.matches("^https://github\\.com/[\\w.-]+/[\\w.-]+(\\.git)?/?$")) {
+                responseMap.put("error", "Provided URL is not a valid GitHub repository.");
                 return ResponseEntity.badRequest().body(responseMap);
             }
 
-            // Validate that the URL belongs to GitHub
-            if (!url1.startsWith("https://github.com/")) {
-                responseMap.put("error", "Provided URL is not a valid GitHub repository.");
+            // Extract "owner/repo" from GitHub URL
+            String repoUrl = GithubLinkOwnerRepoExtractor.extractOwnerRepo(url1);
+            if (repoUrl == null) {
+                responseMap.put("error", "Invalid GitHub repository URL format.");
                 return ResponseEntity.badRequest().body(responseMap);
             }
 
@@ -58,32 +53,30 @@ public class GitHubDefectController {
             JsonNode rootNode = objectMapper.readTree(githubResponse.getBody());
             int openIssuesCount = rootNode.get("open_issues_count").asInt();
 
-            // Fetch total lines of code
+            // Get LOC from adapter
             int totalLinesOfCode = locApiAdapter.getTotalLinesOfCode();
 
             if (totalLinesOfCode == 0) {
-                // If zero, return error-like message, but still keep consistent structure
                 responseMap.put("defectDensity", "N/A (Total lines of code is zero)");
                 responseMap.put("history", null);
                 return ResponseEntity.ok(responseMap);
             }
 
-            // Calculate defect density per 1000 lines of code
+            // Calculate defect density per 1000 LOC
             double defectDensityPerKLOC = (openIssuesCount * 1000.0) / totalLinesOfCode;
+            double defectDensityFormatted = Double.parseDouble(String.format("%.2f", defectDensityPerKLOC));
 
-            // --- Build the payload in the new desired structure ---
-            // Capture the current timestamp and use it for both the current defect and new DB entry
+            // Timestamp
             LocalDateTime currentTimestamp = LocalDateTime.now();
 
-            // Create the "current_defect_density" payload with formatted value (rounded to 2 decimals)
-            double defectDensityFormatted = Double.parseDouble(String.format("%.2f", defectDensityPerKLOC));
+            // Build response
             Map<String, Object> currentDefectMap = new HashMap<>();
             currentDefectMap.put("timestamp", currentTimestamp.toString());
+
             Map<String, Object> currentDataMap = new HashMap<>();
             currentDataMap.put("defect_density", defectDensityFormatted);
-            currentDefectMap.put("data", currentDataMap);
 
-            // Populate the final response map with the new keys
+            currentDefectMap.put("data", currentDataMap);
             responseMap.put("current_defect_density", currentDefectMap);
 
             return ResponseEntity.ok(responseMap);
@@ -99,7 +92,6 @@ public class GitHubDefectController {
             return ResponseEntity.status(500).body(responseMap);
         }
     }
-
 
     @GetMapping("/loc-mock")
     public ResponseEntity<Map<String, Object>> mockLinesOfCodeApi() {

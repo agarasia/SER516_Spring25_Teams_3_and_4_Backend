@@ -15,12 +15,46 @@ This guide provides instructions on how to run the DefectDensity-API application
    ```
 
 3. **Access the API:**
-   Once the application is running, you can access the API using the following URL:
+   
+
+## 🧪 How to Test the Defect Density API using Postman
+
+Follow these steps to send a `POST` request to the API endpoint using [Postman](https://www.postman.com/):
+
+### 🔧 Stepss
+
+1. **Open Postman**.
+
+2. **Set the HTTP method to `POST`** using the dropdown on the left of the URL bar.
+
+3. **Enter the API Endpoint**:
    ```
-   http://localhost:8083/api/defects/repo?url=[Use a git hub repo url] [GET]
+   http://localhost:8003/defectdensity
    ```
-   - **Variable Name:** `url`
-   - **Expected Input Value:** A Github repository URL
+
+4. **Set the Request Body**:
+   - Navigate to the **Body** tab.
+   - Select **raw**.
+   - From the dropdown next to “Text”, choose **JSON**.
+   - Paste the following JSON into the editor:
+     ```json
+     {
+       "repo_url": "{Github_URL}"
+     }
+     ```
+
+5. **(Optional) Set Headers**:
+   - Go to the **Headers** tab.
+   - Ensure the following header is present (usually auto-added):
+     ```
+     Key: Content-Type
+     Value: application/json
+     ```
+
+6. **Click "Send"** to submit the request.
+
+7. **Check the Response**:
+   - A JSON response will return with the calculated metrics or an error message.
 
 
 
@@ -69,11 +103,13 @@ docker stop [DockerContainerName]
 ## Accessing the Application
 Once the container is running, you can access the application by pinging the local host:
 ```
-http://localhost:8083
+http://localhost:8083/defectdensity
 ```
 
 ## testing curl command 
 a sample test Command
 ```
-curl -X GET "http://localhost:8083/api/defects/repo?url=https://github.com/FreeTubeApp/FreeTube/Issues" -H "Accept: application/json"
+   curl -X POST http://localhost:8003/defectdensity \
+     -H "Content-Type: application/json" \
+     -d '{"repo_url":{Github_URL}"}'
 ```

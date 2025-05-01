@@ -1,14 +1,26 @@
 FROM python:3.12.8-slim
 
+# Set base working directory
 WORKDIR /app
 
-# Now we can copy from the entire repo structure
-COPY . /app/LCOM4
-# etc., if you want more
+# Copy LCOM4 source code
+COPY LCOM4/ /app/LCOM4
 
+# Copy shared utilities folder
+COPY utilities/ /app/utilities/
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y git && apt-get clean
+
+# Install Python dependencies
+# Assumes requirements.txt is inside LCOM4/
+RUN pip install --no-cache-dir -r /app/LCOM4/requirements.txt
+
+# Set PYTHONPATH to include /app so that `from utilities...` works
+ENV PYTHONPATH="/app"
+
+# Set working directory to where your main.py lives
 WORKDIR /app/LCOM4
-RUN apt-get update && apt-get install -y git
-RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5001"]

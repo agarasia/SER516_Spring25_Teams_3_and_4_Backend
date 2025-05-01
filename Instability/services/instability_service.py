@@ -18,16 +18,6 @@ def compute_instability(a_data, e_data):
 
 
 def process_instability(input_data):
-    history = []
-    for a_entry, e_entry in zip(
-        input_data["afferent"]["afferent_history"],
-        input_data["efferent"]["efferent_history"]
-    ):
-        history.append({
-            "timestamp": a_entry["timestamp"],
-            "data": compute_instability(a_entry["data"], e_entry["data"])
-        })
-
     current = {
         "timestamp": input_data["afferent"]["current_afferent"]["timestamp"],
         "data": compute_instability(
@@ -37,8 +27,7 @@ def process_instability(input_data):
     }
 
     result = {
-        "instability_history": history,
-        "current_instability": current
+        "instability": current
     }
 
     # store_instability_data_in_mongo(result) 

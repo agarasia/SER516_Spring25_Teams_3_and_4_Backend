@@ -1,7 +1,8 @@
 services:
   afferent-api:
     build:
-      context: ./AfferentCoupling
+      context: .
+      dockerfile: AfferentCoupling/Dockerfile
     container_name: afferent-api-container
     ports:
       - "8081:8081"
@@ -10,7 +11,10 @@ services:
 
   efferent-api:
     build:
-      context: ./EfferentCoupling-API
+      context: .
+      dockerfile: EfferentCoupling-API/Dockerfile
+      args:
+        SERVICE_NAME: efferent
     container_name: efferent-api-container
     ports:
       - "8082:8082"
@@ -27,8 +31,8 @@ services:
 
   lcom4:
     build:
-      context: ./LCOM4
-      dockerfile: dockerfile
+      context: .
+      dockerfile: ./LCOM4/dockerfile
     container_name: lcom4_container
 
     ports:
@@ -42,8 +46,8 @@ services:
 
   lcomhs:
     build:
-      context: ./LCOMHS
-      dockerfile: dockerfile
+      context: .
+      dockerfile: ./LCOMHS/dockerfile
     container_name: lcomhs_container
 
     ports:
@@ -63,7 +67,7 @@ services:
 
     # If you only want the gateway to call it internally, you can omit the port mapping.
     # But let's keep it to show direct access for debugging.
-  
+
   benchmark:
     build:
       context: ./Benchmark
@@ -86,7 +90,7 @@ services:
       dockerfile: Dockerfile
     container_name: gateway_container
     ports:
-      - "8080:8080"  # host:gateway
+      - "8080:8080" # host:gateway
     environment:
       - LCOM4_SERVICE_URL=http://lcom4:8000
       - LCOMHS_SERVICE_URL=http://lcomhs:8000
