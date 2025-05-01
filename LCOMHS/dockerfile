@@ -25,4 +25,4 @@ WORKDIR /app/LCOMHS
 EXPOSE 5000
 
 # Run the FastAPI server
-CMD ["uvicorn", "main:app"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
