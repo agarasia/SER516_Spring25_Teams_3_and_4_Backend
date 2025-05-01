@@ -1,22 +1,14 @@
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
   afferent-api:
     build:
-      context: .                            
+      context: .
       dockerfile: AfferentCoupling/Dockerfile
     container_name: afferent-api-container
     ports:
       - "8081:8081"
-    volumes:
-      - shared-repos:/shared/repos
-  
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/afferent_db
+
   efferent-api:
     build:
       context: .
@@ -26,8 +18,9 @@ services:
     container_name: efferent-api-container
     ports:
       - "8082:8082"
-    volumes:
-      - shared-repos:/shared/repos
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/efferent_coupling_db
+
   
   defectdensity-api:
     build:
@@ -38,13 +31,12 @@ services:
 
   lcom4:
     build:
-      context: ./LCOM4
-      dockerfile: dockerfile
+      context: .
+      dockerfile: ./LCOM4/dockerfile
     container_name: lcom4_container
-    # depends_on:
-    #   - mongodb
+
     ports:
-      - "8001:8000"   # host:container
+      - "5000:5000"   # host:container
     # environment:
     #   - MONGO_URI=mongodb://mongodb:27017/
     volumes:
@@ -54,35 +46,28 @@ services:
 
   lcomhs:
     build:
-      context: ./LCOMHS
-      dockerfile: dockerfile
+      context: .
+      dockerfile: ./LCOMHS/dockerfile
     container_name: lcomhs_container
-    # depends_on:
-    #   - mongodb
+
     ports:
-      - "8002:8000"   # host:container
-    # environment:
-    #   - MONGO_URI=mongodb://mongodb:27017/
-    volumes:
-      - shared-repos:/shared/repos
-    # If you only want the gateway to call it internally, you can omit the port mapping.
-    # But let's keep it to show direct access for debugging.
+      - "5000:5000"   # host:container
+
+
 
   defectscore:
     build:
       context: ./DefectScore
       dockerfile: dockerfile
     container_name: defect_score_container
-    depends_on:
-      - mongodb
+
     ports:
       - "8003:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
+
 
     # If you only want the gateway to call it internally, you can omit the port mapping.
     # But let's keep it to show direct access for debugging.
-  
+
   benchmark:
     build:
       context: ./Benchmark
@@ -90,8 +75,6 @@ services:
     container_name: benchmark_container
     ports:
       - "8004:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
 
   instability:
     build:
@@ -100,8 +83,6 @@ services:
     container_name: instability_container
     ports:
       - "8005:8000"   # host:container
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/
 
   gateway:
     build:
@@ -109,7 +90,7 @@ services:
       dockerfile: Dockerfile
     container_name: gateway_container
     ports:
-      - "8080:8080"  # host:gateway
+      - "8080:8080" # host:gateway
     environment:
       - LCOM4_SERVICE_URL=http://lcom4:8000
       - LCOMHS_SERVICE_URL=http://lcomhs:8000
@@ -130,5 +111,4 @@ services:
       - defectdensity-api
 
 volumes:
-  mongo_data:
   shared-repos:

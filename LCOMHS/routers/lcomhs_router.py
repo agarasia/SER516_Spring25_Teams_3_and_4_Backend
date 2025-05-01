@@ -1,59 +1,54 @@
-from services.shared_volume_service import fetch_repo
-# from services.shared_volume_service import clone_repo
-from fastapi import APIRouter, HTTPException, Form,  Body, Query
-from typing import Optional
+from fastapi import APIRouter, HTTPException, Request
+from datetime import datetime
 
+from utilities.fetch_repo import fetch_repo
 from services.lcomhs_calculator import calculate_lcomhs
 from services.project_parser import parse_java_files_in_dir
-from datetime import datetime
-import time
 
 router = APIRouter()
 
-@router.post("/calculate")
-async def calculate_lcomhs_endpoint(
-    gitHubLink: Optional[str] = Form(
-        None, description="GitHub URL"
-    )
-):
+@router.post("/lcomhs")
+async def calculate_lcomhs_endpoint(request: Request):
     """
-    Single endpoint to compute LCOMHS from a GitHub URL.
+    Endpoint to compute LCOMHS from a GitHub URL.
 
-    Request:
-      - multipart/form-data
-      - Fields:
-        gitHubLink: The GitHub URL
+    Requirements:
+      - GitHub repo must already be cloned into /shared/repos.
+      - Request body must contain: {"repo_url": "<github_repo_link>"}.
 
     Response:
       - JSON object with LCOMHS results for each Java class.
     """
-    
-    temp_dir = None
-    
     try:
+        # Get JSON from request
+        data = await request.json()
+        gitHubLink = data.get("repo_url")
+
         if not gitHubLink:
-            raise HTTPException(status_code=400, detail="Please provide a GitHub URL in gitHubLink.")
+            raise HTTPException(status_code=400, detail="Please provide a GitHub URL in 'repo_url'.")
 
-        # headsh1, dir_path = clone_repo(gitHubLink)  # un comment this line and clone_repo for testing
+        # Fetch repo from shared volume
+        fetch_result = fetch_repo(gitHubLink)
 
-        # fetch the GitHub repo from shared volume
-        headsh, temp_dir = fetch_repo(gitHubLink)
+        if isinstance(fetch_result, dict) and "error" in fetch_result:
+            raise HTTPException(status_code=400, detail=fetch_result["error"])
 
-        # Parse .java files and compute LCOMHS
-        java_classes = parse_java_files_in_dir(temp_dir)
-        results = []
-        for cls in java_classes:
-            lcomhs_value = calculate_lcomhs(cls)
-            results.append({"class_name": cls.name, "score": lcomhs_value})
+        head_sha, repo_dir = fetch_result
 
-        current_timestamp = datetime.utcfromtimestamp(time.time()).isoformat() + "Z"
+        # Parse Java classes and calculate LCOMHS
+        java_classes = parse_java_files_in_dir(repo_dir)
+        results = [{"class_name": cls.name, "score": calculate_lcomhs(cls)} for cls in java_classes]
 
-        response={
-            "timestamp": current_timestamp,
+        # Build API response
+        response = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "commit_sha": head_sha,
             "data": results
         }
-        
+
         return response
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

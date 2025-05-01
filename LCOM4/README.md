@@ -25,6 +25,8 @@ docker rm lcom4-api-container
 ```
 
 ## testing curl command 
-curl -X POST "http://localhost:8001/api/lcom4/calculate" -F "gitHubLink={Github_URL}"
+curl -X POST "http://localhost:8000/lcomh4" \
+     -H "Content-Type: application/json" \
+     -d '{"repo_url": "{Github_URL}"}'
 
 

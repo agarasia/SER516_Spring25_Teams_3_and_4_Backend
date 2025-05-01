@@ -25,15 +25,46 @@ This guide provides instructions on how to run the Afferent Coupling API applica
 
 ## Testing the API using Postman
 
-1. Open Postman
 
-2. Select **POST** request
+## 🧪 How to Test the Afferent API using Postman
 
-3. Enter the API Endpoint:
-    ```bash
-    http://localhost:8081/afferent/github?repoUrl={GITHUB_URL}
-    ```
-4. Send the Request and verify response
+Follow these steps to send a `POST` request to the API endpoint using [Postman](https://www.postman.com/):
+
+### 🔧 Steps
+
+1. **Open Postman**.
+
+2. **Set the HTTP method to `POST`** using the dropdown on the left of the URL bar.
+
+3. **Enter the API Endpoint**:
+   ```
+   http://localhost:8001/afferent
+   ```
+
+4. **Set the Request Body**:
+   - Navigate to the **Body** tab.
+   - Select **raw**.
+   - From the dropdown next to “Text”, choose **JSON**.
+   - Paste the following JSON into the editor:
+     ```json
+     {
+       "repo_url": "{Github_URL}"
+     }
+     ```
+
+5. **(Optional) Set Headers**:
+   - Go to the **Headers** tab.
+   - Ensure the following header is present (usually auto-added):
+     ```
+     Key: Content-Type
+     Value: application/json
+     ```
+
+6. **Click "Send"** to submit the request.
+
+7. **Check the Response**:
+   - A JSON response will return with the calculated metrics or an error message.
+
 
 
 ## Building and Running with Docker
@@ -64,6 +95,8 @@ docker rm afferent-api-container
 ```
 
 ## testing curl command 
-curl -X POST "http://localhost:8081/afferent/github?repoUrl={Github_URL}"
+curl -X POST http://localhost:8001/afferent \
+     -H "Content-Type: application/json" \
+     -d '{"repo_url":{Github_URL}"}'
 
 
