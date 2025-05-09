@@ -11,7 +11,7 @@ typing_extensions==4.12.2
 
 # Web framework internals
 starlette==0.46.0
-anyio==4.8.0
+anyio==4.9.0
 sniffio==1.3.1
 h11==0.14.0
 idna==3.10
