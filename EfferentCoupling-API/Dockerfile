@@ -12,7 +12,7 @@ RUN mvn -q package -DskipTests
 # → target/*.jar
 
 ################  Run  ##################
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:17.0.19_10-jdk-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
